@@ -94,7 +94,8 @@ class DXXAPI BusDispatcher : public Dispatcher
 {
 public:
 
-	BusDispatcher() : _ctx(NULL), _priority(G_PRIORITY_DEFAULT) {}
+	BusDispatcher();
+	~BusDispatcher();
 
 	void attach(GMainContext *);
 
@@ -116,6 +117,7 @@ private:
 
 	GMainContext *_ctx;
 	int _priority;
+	GSource *_source;
 };
 
 } /* namespace Glib */

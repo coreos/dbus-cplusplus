@@ -85,7 +85,7 @@ void Connection::Private::init()
 		this, &Connection::Private::disconn_filter_function
 	);
 
-	dbus_connection_add_filter(conn, message_filter_stub, &disconn_filter, NULL);
+	dbus_connection_add_filter(conn, message_filter_stub, &disconn_filter, NULL); // TODO: some assert at least
 
 	dbus_connection_set_dispatch_status_function(conn, dispatch_status_stub, this, 0);
 	dbus_connection_set_exit_on_disconnect(conn, false); //why was this set to true??
@@ -171,6 +171,17 @@ bool Connection::Private::disconn_filter_function(const Message &msg)
 	}
 	return false;
 }
+
+DBusDispatchStatus Connection::Private::dispatch_status()
+{
+	return dbus_connection_get_dispatch_status(conn);
+}
+
+bool Connection::Private::has_something_to_dispatch()
+{
+	return dispatch_status() == DBUS_DISPATCH_DATA_REMAINS;
+}
+
 
 Connection Connection::SystemBus()
 {

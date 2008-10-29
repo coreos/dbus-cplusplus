@@ -63,6 +63,9 @@ struct DXXAPILOCAL Connection::Private
 
 	void init();
 
+	DBusDispatchStatus dispatch_status();
+	bool has_something_to_dispatch();
+
 	static void dispatch_status_stub(DBusConnection *, DBusDispatchStatus, void *);
 
 	static DBusHandlerResult message_filter_stub(DBusConnection *, DBusMessage *, void *);

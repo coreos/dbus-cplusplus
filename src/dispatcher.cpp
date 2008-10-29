@@ -148,9 +148,28 @@ void Dispatcher::queue_connection(Connection::Private *cp)
 	_mutex_p.unlock();
 }
 
+
+bool Dispatcher::has_something_to_dispatch()
+{
+	_mutex_p.lock();
+	bool has_something = false;
+	for(Connection::PrivatePList::iterator it = _pending_queue.begin();
+		it != _pending_queue.end() && !has_something;
+		++it)
+	{
+		has_something = (*it)->has_something_to_dispatch();
+	}
+
+	_mutex_p.unlock();
+	return has_something;
+}
+
+
 void Dispatcher::dispatch_pending()
 {
 	_mutex_p.lock();
+
+	// SEEME: dbus-glib is dispatching only one message at a time to not starve the loop/other things...
 
 	while (_pending_queue.size() > 0)
 	{

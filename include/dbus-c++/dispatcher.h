@@ -101,6 +101,7 @@ public:
 	void queue_connection(Connection::Private *);
 
 	void dispatch_pending();
+	bool has_something_to_dispatch();
 
 	virtual void enter() = 0;
 

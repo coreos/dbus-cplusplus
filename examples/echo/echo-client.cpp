@@ -30,10 +30,10 @@ static const int THREADS = 3;
 
 static bool spin = true;
 
+static DBus::Connection *conn;
+
 void *greeter_thread(void *arg)
 {
-	DBus::Connection *conn = reinterpret_cast<DBus::Connection *>(arg);
-
 	EchoClient client(*conn, ECHO_SERVER_PATH, ECHO_SERVER_NAME);
 
 	char idstr[16];
@@ -72,13 +72,15 @@ int main()
 
 	DBus::default_dispatcher = &dispatcher;
 
-	DBus::Connection conn = DBus::Connection::SessionBus();
+	DBus::Connection c = DBus::Connection::SessionBus();
+
+	conn = &c;
 
 	pthread_t threads[THREADS];
 
 	for (int i = 0; i < THREADS; ++i)
 	{
-		pthread_create(threads+i, NULL, greeter_thread, &conn);
+		pthread_create(threads+i, NULL, greeter_thread, NULL);
 	}
 
 	dispatcher.enter();

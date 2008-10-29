@@ -9,5 +9,5 @@ Version: @VERSION@
 Requires: 
 Conflicts: 
 Libs: ${pcfiledir}/${libdir}/libdbus-c++-1.la
-Cflags: -I${pcfiledir}/${includedir}
+Cflags: -I${pcfiledir}/@srcdir@/${includedir} -I${pcfiledir}/${includedir}
 
