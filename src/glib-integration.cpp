@@ -263,7 +263,7 @@ void Glib::BusDispatcher::attach(GMainContext *ctx)
 	g_assert(_ctx == NULL); // just to be sane
 
 	_ctx = ctx ? ctx : g_main_context_default();
- 	g_main_context_ref(ctx);
+ 	g_main_context_ref(_ctx);
 	
 	// create the source for dispatching messages
 	_source = g_source_new((GSourceFuncs *) &dispatcher_funcs,
