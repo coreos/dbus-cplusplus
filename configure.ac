@@ -120,20 +120,18 @@ xml_LIBS=-lexpat
 AC_SUBST(xml_CFLAGS)
 AC_SUBST(xml_LIBS)
 
-AC_CHECK_LIB([pthread], pthread_create,
-	[AC_CHECK_HEADERS(pthread.h, have_pthread=true, have_pthread=false)],
-	have_pthread=false)
-
-if test "$have_pthread" = "false"; then
-	AC_MSG_ERROR([You need the POSIX Thread library (pthreads)])	
+ACX_PTHREAD
+if test x"$acx_pthread_ok" = xyes; then
+	AC_DEFINE(HAVE_PTHREAD_H, 1, [Define to enable pthread support])
+	AM_CONDITIONAL(HAVE_PTHREAD, test x"$acx_pthread_ok" = xyes)
 fi
 
 if test "$enable_debug" = "yes" ; then
-	CXXFLAGS="$CXXFLAGS -Wall -ggdb -O0 -DDEBUG"
+	CXXFLAGS="$CXXFLAGS -Wall -ggdb -O0"
+	AC_DEFINE(DEBUG, 1, [Define to enable debug build])
 else
 	CXXFLAGS="$CXXFLAGS -Wall -O3"
 fi
-
 
 # Doxygen Documentation
 
