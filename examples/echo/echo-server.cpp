@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "echo-server.h"
 #include <unistd.h>
 #include <stdlib.h>

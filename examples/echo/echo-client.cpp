@@ -1,11 +1,11 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "echo-client.h"
 #include <iostream>
 #include <pthread.h>
 #include <signal.h>
-
-#ifdef HAVE_CONFIG_H
-#include <dbus-c++/config.h>
-#endif
 
 using namespace std;
 
@@ -30,10 +30,10 @@ static const int THREADS = 3;
 
 static bool spin = true;
 
-static DBus::Connection *conn;
-
 void *greeter_thread(void *arg)
 {
+	DBus::Connection *conn = reinterpret_cast<DBus::Connection *>(arg);
+
 	EchoClient client(*conn, ECHO_SERVER_PATH, ECHO_SERVER_NAME);
 
 	char idstr[16];
@@ -64,23 +64,17 @@ int main()
 	signal(SIGTERM, niam);
 	signal(SIGINT, niam);
 
-#ifdef DBUS_HAS_THREADS_INIT_DEFAULT
 	DBus::_init_threading();
-#else
-	cerr << "Thread support is not enabled! your D-Bus version is too old" << endl;
-#endif
 
 	DBus::default_dispatcher = &dispatcher;
 
-	DBus::Connection c = DBus::Connection::SessionBus();
-
-	conn = &c;
+	DBus::Connection conn = DBus::Connection::SessionBus();
 
 	pthread_t threads[THREADS];
 
 	for (int i = 0; i < THREADS; ++i)
 	{
-		pthread_create(threads+i, NULL, greeter_thread, NULL);
+		pthread_create(threads+i, NULL, greeter_thread, &conn);
 	}
 
 	dispatcher.enter();
