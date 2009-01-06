@@ -6,7 +6,8 @@ AM_CPPFLAGS = \
 	$(dbus_CFLAGS) \
 	$(xml_CFLAGS) \
 	-I$(top_srcdir)/include \
-	-I$(top_builddir)/include
+	-I$(top_builddir)/include \
+	-Wall
 
 if CROSS_COMPILING
 libdbus_cxx_la = $(BUILD_LIBDBUS_CXX_DIR)/src/libdbus-c++-1.la
