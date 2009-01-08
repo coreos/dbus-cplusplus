@@ -21,7 +21,9 @@
  *
  */
 
-
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <dbus-c++/glib-integration.h>
 
 #include <dbus/dbus.h> // for DBUS_WATCH_*

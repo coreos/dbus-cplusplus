@@ -1,6 +1,7 @@
 AM_CPPFLAGS = \
 	$(dbus_CFLAGS) \
 	$(glib_CFLAGS) \
+	$(PRIVATE_CFLAGS) \
 	-I$(top_srcdir)/include \
 	-I$(top_builddir)/include
 
@@ -9,11 +10,8 @@ GLIB_H = $(HEADER_DIR)/glib-integration.h
 GLIB_CPP = glib-integration.cpp
 endif
 
-CONFIG_H = $(top_builddir)/include/dbus-c++/config.h
-
 HEADER_DIR  = $(top_srcdir)/include/dbus-c++
 HEADER_FILES = \
-	$(CONFIG_H) \
 	$(HEADER_DIR)/dbus.h \
 	$(HEADER_DIR)/types.h \
 	$(HEADER_DIR)/connection.h \

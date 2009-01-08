@@ -4,7 +4,7 @@ AC_PREREQ(2.59)
 AC_INIT([libdbus-c++], 0.5.0, [shackan@gmail.com])
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
-AM_CONFIG_HEADER([include/dbus-c++/config.h])
+AM_CONFIG_HEADER([config.h])
 
 AC_CANONICAL_HOST
 
@@ -172,7 +172,6 @@ AC_ARG_WITH(build-libdbus-cxx,
 	[ BUILD_LIBDBUS_CXX_DIR="\$(top_builddir)" ]
 )
 AC_SUBST(BUILD_LIBDBUS_CXX_DIR)
-
 
 # Save processed files
 
