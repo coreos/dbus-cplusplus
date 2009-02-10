@@ -54,6 +54,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/dbusxx-xml2cpp
 %{prefix}/bin/dbusxx-introspect
 %{prefix}/lib/libdbus-c*.a
+%{prefix}/lib/libdbus-c*.la
 %{prefix}/include/dbus-c++-1
 %{prefix}/lib/pkgconfig/*.pc
 
