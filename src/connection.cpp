@@ -398,6 +398,17 @@ void Connection::request_name(const char *name, int flags)
 	}
 }
 
+unsigned long Connection::sender_unix_uid(const char *sender)
+{
+    InternalError e;
+    
+    unsigned long ul = dbus_bus_get_unix_user(_pvt->conn, sender, e);
+    
+    if (e) throw Error(e);
+    
+    return ul;
+}
+
 bool Connection::has_name(const char *name)
 {	
 	InternalError e;

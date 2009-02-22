@@ -409,6 +409,8 @@ public:
 	PendingCall send_async( Message& msg, int timeout = -1);
 
 	void request_name( const char* name, int flags = 0 );
+    
+    unsigned long sender_unix_uid(const char *sender);
 
 	/*!
 	 * \brief Asks the bus whether a certain name has an owner.
