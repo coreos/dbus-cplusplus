@@ -17,7 +17,9 @@ endif
 
 bin_PROGRAMS = dbusxx-xml2cpp dbusxx-introspect
 
-dbusxx_xml2cpp_SOURCES = xml.h xml.cpp xml2cpp.h xml2cpp.cpp
+dbusxx_xml2cpp_SOURCES = xml.h xml.cpp xml2cpp.h xml2cpp.cpp \
+	generate_adaptor.cpp  generate_adaptor.h  generate_proxy.cpp\
+	generate_proxy.h  generator_utils.cpp  generator_utils.h
 dbusxx_xml2cpp_LDADD = $(libdbus_cxx_la) $(xml_LIBS)
 
 dbusxx_introspect_SOURCES = introspect.h introspect.cpp
