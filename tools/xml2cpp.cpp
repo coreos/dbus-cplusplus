@@ -21,9 +21,6 @@
  *
  */
 
-
-#include "xml2cpp.h"
-
 #include <dbus/dbus.h>
 
 #include <cstdlib>
