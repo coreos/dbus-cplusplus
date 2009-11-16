@@ -75,20 +75,20 @@ void Ecore::BusTimeout::_disable()
   ecore_timer_del (_etimer);
 }
 
-static bool watch_prepare( int *timeout )
+/*static bool watch_prepare( int *timeout )
 {
 	debug_log("ecore: watch_prepare");
 
 	*timeout = -1;
 	return false;
-}
+}*/
 
-static bool watch_check( )
+/*static bool watch_check( )
 {
 	debug_log("ecore: watch_check");
 
 	return true;
-}
+}*/
 
 static bool watch_dispatch( void *data )
 {
@@ -135,13 +135,13 @@ int Ecore::BusWatch::watch_handler_read( void *data, Ecore_Fd_Handler *fdh  )
 
 int Ecore::BusWatch::watch_handler_error( void *data, Ecore_Fd_Handler *fdh  )
 {
-	Ecore::BusWatch* w = reinterpret_cast<Ecore::BusWatch*>(data);
+	//Ecore::BusWatch* w = reinterpret_cast<Ecore::BusWatch*>(data);
 
 	debug_log("ecore: watch_handler_error");
 
-	int flags = DBUS_WATCH_ERROR;
+	//int flags = DBUS_WATCH_ERROR;
   
-  watch_dispatch(NULL);
+	watch_dispatch(NULL);
 
 	return 1;
 }
@@ -150,7 +150,7 @@ void Ecore::BusWatch::_enable()
 {
   debug_log("Ecore::BusWatch::_enable()");
   
-  int flags = Watch::flags();
+  //int flags = Watch::flags();
   
   fd_handler_read = ecore_main_fd_handler_add (Watch::descriptor(),
                                                             ECORE_FD_READ,
