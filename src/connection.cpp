@@ -384,9 +384,17 @@ void Connection::request_name(const char *name, int flags)
 
 	debug_log("%s: registering bus name %s", unique_name(), name);
 
-	dbus_bus_request_name(_pvt->conn, name, flags, e);	//we deliberately don't check return value
+        /*
+         * TODO:
+         * Think about giving back the 'ret' value. Some people on the list
+         * requested about this...
+         */
+	int ret = dbus_bus_request_name(_pvt->conn, name, flags, e);
 
-	if (e) throw Error(e);
+	if (ret == -1)
+	{
+		if (e) throw Error(e);
+	}
 
 //	this->remove_match("destination");
 

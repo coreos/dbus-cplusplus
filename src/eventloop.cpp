@@ -136,6 +136,11 @@ void DefaultMainLoop::dispatch()
 
 	int nfd = _watches.size();
 
+	if(_fdunlock)
+	{
+		nfd=nfd+2;
+	}
+
 	pollfd fds[nfd];
 
 	DefaultWatches::iterator wi = _watches.begin();
@@ -151,6 +156,18 @@ void DefaultMainLoop::dispatch()
 			++nfd;
 		}
 	}
+
+	if(_fdunlock){
+		fds[nfd].fd = _fdunlock[0];
+		fds[nfd].events = POLLIN | POLLOUT | POLLPRI ;
+		fds[nfd].revents = 0;
+		
+		nfd++;
+		fds[nfd].fd = _fdunlock[1];
+		fds[nfd].events = POLLIN | POLLOUT | POLLPRI ;
+		fds[nfd].revents = 0;
+	}
+
 	_mutex_w.unlock();
 
 	int wait_min = 10000;

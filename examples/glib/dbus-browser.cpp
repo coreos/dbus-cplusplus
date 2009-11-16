@@ -126,7 +126,10 @@ int main(int argc, char *argv[])
 
 	dispatcher.attach(NULL);
 
+	// activate one of both for either system or session bus
+	// TODO: choose in the GUI
 	DBus::Connection conn = DBus::Connection::SessionBus();
+	//DBus::Connection conn = DBus::Connection::SystemBus();
 
 	DBusBrowser browser(conn);
 

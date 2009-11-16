@@ -20,6 +20,13 @@ AC_ARG_ENABLE(debug,
 	[enable_debug=no]
 )
 
+AC_ARG_ENABLE(ecore,
+	AS_HELP_STRING([--enable-ecore],
+		[enable ecore integration]),
+	[enable_ecore=$enableval],
+	[enable_ecore=no]
+)
+
 AC_ARG_ENABLE(glib,
 	AS_HELP_STRING([--enable-glib],
 		[enable glib integration]),
@@ -105,6 +112,15 @@ AM_CONDITIONAL(ENABLE_GLIB, test 0 = 1)
 AM_CONDITIONAL(HAVE_GTKMM, test 0 = 1)
 fi
 
+if test "$enable_ecore" = "yes" ; then
+PKG_CHECK_MODULES([ecore], ecore)
+AC_SUBST(ecore_CFLAGS)
+AC_SUBST(ecore_LIBS)
+AM_CONDITIONAL(ENABLE_ECORE, test 1 = 1)
+else
+AM_CONDITIONAL(ENABLE_ECORE, test 0 = 1)
+fi
+
 AC_CHECK_LIB([expat], XML_ParserCreate_MM,
    	[AC_CHECK_HEADERS(expat.h, have_expat=true, have_expat=false)],
 	have_expat=false)
@@ -185,6 +201,7 @@ AC_OUTPUT(
 	examples/Makefile
 	examples/properties/Makefile
 	examples/echo/Makefile
+	examples/ecore/Makefile
 	examples/hal/Makefile
 	examples/glib/Makefile
 	dbus-c++-1.pc

@@ -25,6 +25,8 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include <dbus-c++/eventloop-integration.h>
 #include <dbus-c++/debug.h>
 
@@ -85,6 +87,9 @@ void BusDispatcher::enter()
 void BusDispatcher::leave()
 {
 	_running = false;
+	write(_fdunlock[1],"exit",strlen("exit"));
+	close(_fdunlock[1]);
+	close(_fdunlock[0]);
 }
 
 void BusDispatcher::do_iteration()

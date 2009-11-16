@@ -60,8 +60,17 @@ class DXXAPI BusDispatcher : public Dispatcher, public DefaultMainLoop
 {
 public:
 
+	int _pipe[2];
+
 	BusDispatcher() : _running(false)
-	{}
+	{
+		//pipe to create a new fd used to unlock a dispatcher at any
+       // moment (used by leave function)
+		pipe(_pipe);
+		_fdunlock[0] = _pipe[0];
+		_fdunlock[1] = _pipe[1];
+		
+	}
 
 	~BusDispatcher()
 	{}
