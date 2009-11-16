@@ -26,7 +26,6 @@
 
 #include "generator_utils.h"
 
-
 using namespace std;
 
 const char *tab = "    ";
@@ -40,7 +39,7 @@ const char *header = "\n\
 
 const char *dbus_includes = "\n\
 #include <dbus-c++/dbus.h>\n\
-\n\
+#include <cassert>\n\
 ";
 
 void underscorize(string &str)
