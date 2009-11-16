@@ -202,6 +202,7 @@ Connection Connection::ActivationBus()
 }
 
 Connection::Connection(const char *address, bool priv)
+: _timeout(-1)
 {
 	InternalError e;
 	DBusConnection *conn = priv 
@@ -218,13 +219,13 @@ Connection::Connection(const char *address, bool priv)
 }
 
 Connection::Connection(Connection::Private *p)
-: _pvt(p)
+: _pvt(p), _timeout(-1)
 {
 	setup(default_dispatcher);
 }
 
 Connection::Connection(const Connection &c)
-: _pvt(c._pvt)
+: _pvt(c._pvt),_timeout(c._timeout)
 {
 	dbus_connection_ref(_pvt->conn);
 }
@@ -360,7 +361,14 @@ Message Connection::send_blocking(Message &msg, int timeout)
 	DBusMessage *reply;
 	InternalError e;
 	
-	reply = dbus_connection_send_with_reply_and_block(_pvt->conn, msg._pvt->msg, timeout, e);
+	if (this->_timeout != -1)
+	{
+		reply = dbus_connection_send_with_reply_and_block(_pvt->conn, msg._pvt->msg, this->_timeout, e);
+	}
+	else
+	{
+		reply = dbus_connection_send_with_reply_and_block(_pvt->conn, msg._pvt->msg, timeout, e);
+	}
 
 	if (e) throw Error(e);
 
@@ -442,5 +450,15 @@ bool Connection::start_service(const char *name, unsigned long flags)
 	if (e) throw Error(e);
 	
 	return b;
+}
+
+void Connection::set_timeout(int timeout)
+{
+	_timeout=timeout;
+}
+	
+int Connection::get_timeout()
+{
+	return _timeout;
 }
 
