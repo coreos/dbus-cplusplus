@@ -126,7 +126,7 @@ class DXXAPI DefaultMutex
 {
 public:
 
-	DefaultMutex();
+	DefaultMutex(bool recursive = false);
 
 	~DefaultMutex();
 
