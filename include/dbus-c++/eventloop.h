@@ -126,7 +126,16 @@ class DXXAPI DefaultMutex
 {
 public:
 
-	DefaultMutex(bool recursive = false);
+  /*!
+   * Constructor for non recursive Mutex
+   */
+  DefaultMutex();
+
+  /*!
+   * Constructor
+   * \param recursive Set if Mutex should be recursive or not.
+   */
+	DefaultMutex(bool recursive);
 
 	~DefaultMutex();
 
