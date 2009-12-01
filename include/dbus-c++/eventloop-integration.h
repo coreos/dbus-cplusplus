@@ -25,6 +25,7 @@
 #ifndef __DBUSXX_EVENTLOOP_INTEGRATION_H
 #define __DBUSXX_EVENTLOOP_INTEGRATION_H
 
+#include <errno.h>
 #include "api.h"
 #include "dispatcher.h"
 #include "util.h"
@@ -65,8 +66,10 @@ public:
 	BusDispatcher() : _running(false)
 	{
 		//pipe to create a new fd used to unlock a dispatcher at any
-       // moment (used by leave function)
-		pipe(_pipe);
+    // moment (used by leave function)
+		int ret = pipe(_pipe);
+		if (ret == -1) throw Error("PipeError:errno", toString(errno).c_str());
+    
 		_fdunlock[0] = _pipe[0];
 		_fdunlock[1] = _pipe[1];
 		

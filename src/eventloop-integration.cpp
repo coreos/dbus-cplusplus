@@ -33,6 +33,7 @@
 #include <sys/poll.h>
 
 #include <dbus/dbus.h>
+#include <errno.h>
 
 using namespace DBus;
 
@@ -87,7 +88,10 @@ void BusDispatcher::enter()
 void BusDispatcher::leave()
 {
 	_running = false;
-	write(_fdunlock[1],"exit",strlen("exit"));
+  
+	int ret = write(_fdunlock[1],"exit",strlen("exit"));
+	if (ret == -1) throw Error("WriteError:errno", toString(errno).c_str());
+  
 	close(_fdunlock[1]);
 	close(_fdunlock[0]);
 }
