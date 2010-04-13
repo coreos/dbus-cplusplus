@@ -6,6 +6,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <signal.h>
+#include <stdio.h>
 
 using namespace std;
 

@@ -79,11 +79,10 @@ bool Error::is_set() const
 
 void Error::set(const char *name, const char *message)
 {
-	dbus_set_error_const(&(_int->error), name, message);
+	dbus_set_error(&(_int->error), name, message);
 }
 
 const char *Error::what() const throw()
 {
 	return _int->error.message;
 }
-

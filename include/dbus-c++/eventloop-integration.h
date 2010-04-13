@@ -26,6 +26,7 @@
 #define __DBUSXX_EVENTLOOP_INTEGRATION_H
 
 #include <errno.h>
+#include <string.h>
 #include "api.h"
 #include "dispatcher.h"
 #include "util.h"
@@ -68,8 +69,12 @@ public:
 		//pipe to create a new fd used to unlock a dispatcher at any
     // moment (used by leave function)
 		int ret = pipe(_pipe);
-		if (ret == -1) throw Error("PipeError:errno", toString(errno).c_str());
-    
+		if (ret == -1) {
+                  char buffer[128]; // buffer copied in Error constructor
+                  throw Error("PipeError:errno", strerror_r(errno,
+                                                            buffer,
+                                                            sizeof(buffer)));
+                }
 		_fdunlock[0] = _pipe[0];
 		_fdunlock[1] = _pipe[1];
 		

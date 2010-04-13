@@ -90,8 +90,12 @@ void BusDispatcher::leave()
 	_running = false;
   
 	int ret = write(_fdunlock[1],"exit",strlen("exit"));
-	if (ret == -1) throw Error("WriteError:errno", toString(errno).c_str());
-  
+	if (ret == -1) {
+          char buffer[128]; // buffer copied in Error constructor
+          throw Error("PipeError:errno", strerror_r(errno,
+                                                    buffer,
+                                                    sizeof(buffer)));
+        }
 	close(_fdunlock[1]);
 	close(_fdunlock[0]);
 }
@@ -172,4 +176,3 @@ void BusDispatcher::watch_ready(DefaultWatch &ew)
 
 	watch->handle(flags);
 }
-
