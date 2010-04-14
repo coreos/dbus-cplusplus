@@ -35,6 +35,69 @@ extern const char *tab;
 extern const char *header;
 extern const char *dbus_includes;
 
+
+/*! Generate adaptor code for object methods
+  */
+void generate_methods(const Xml::Nodes &methods, ostringstream &body) {
+
+	for (Xml::Nodes::const_iterator mi = methods.begin(); mi != methods.end(); ++mi)
+	{
+		Xml::Node &method = **mi;
+		Xml::Nodes args = method["arg"];
+		Xml::Nodes args_in = args.select("direction","in");
+		Xml::Nodes args_out = args.select("direction","out");
+
+		body << tab << "virtual ";
+
+		if (args_out.size() == 0 || args_out.size() > 1)
+		{
+			body << "void ";
+		}
+		else if (args_out.size() == 1)
+		{
+			body << signature_to_type(args_out.front()->get("type")) << " ";
+		}
+
+		// generate the method name
+		body << method.get("name") << "(";
+
+		// generate the methods 'in' variables
+		unsigned int i = 0;
+		for (Xml::Nodes::iterator ai = args_in.begin(); ai != args_in.end(); ++ai, ++i)
+		{
+			Xml::Node &arg = **ai;
+			body << "const " << signature_to_type(arg.get("type")) << "& ";
+
+			string arg_name = arg.get("name");
+			if (arg_name.length())
+				body << arg_name;
+
+			body << ", ";
+		}
+
+		// generate the method 'out' variables if multiple 'out' values exist
+		if (args_out.size() > 1)
+		{
+			unsigned int i = 0;
+			for (Xml::Nodes::iterator ao = args_out.begin(); ao != args_out.end(); ++ao, ++i)
+			{
+				Xml::Node &arg = **ao;
+				body << signature_to_type(arg.get("type")) << "&";
+
+				string arg_name = arg.get("name");
+				if (arg_name.length())
+					body << " " << arg_name;
+
+				body << ", ";
+			}
+		}
+
+		body << "::DBus::Error &error";
+		body << ") = 0;" << endl;
+	}
+}
+
+
 /*! Generate adaptor code for a XML introspection
   */
 void generate_adaptor(Xml::Document &doc, const char *filename)
@@ -73,7 +136,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 
 		// these interface names are skipped.
 		if (ifacename == "org.freedesktop.DBus.Introspectable"
-		        ||ifacename == "org.freedesktop.DBus.Properties")
+				||ifacename == "org.freedesktop.DBus.Properties")
 		{
 			cerr << "skipping interface " << ifacename << endl;
 			continue;
@@ -93,7 +156,6 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			++nspaces;
 		}
 		body << endl;
-
 		string ifaceclass;
 
 		getline(ss, ifaceclass);
@@ -122,12 +184,12 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			<< property.get("name") << ", "
 			<< "\"" << property.get("type") << "\", "
 			<< (property.get("access").find("read") != string::npos
-			    ? "true"
-			    : "false")
+				? "true"
+				: "false")
 			<< ", "
 			<< (property.get("access").find("write") != string::npos
-			    ? "true"
-			    : "false")
+				? "true"
+				: "false")
 			<< ");" << endl;
 		}
 
@@ -153,7 +215,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			Xml::Node &method = **mi;
 			Xml::Nodes args = method["arg"];
 
-			body << tab << tab << "static ::DBus::IntrospectedArgument " << method.get("name") << "_args[] = " << endl
+			body << tab << tab << "static ::DBus::IntrospectedArgument " << method.get("name") << "_args[] =" << endl
 			<< tab << tab << "{" << endl;
 
 			for (Xml::Nodes::iterator ai = args.begin(); ai != args.end(); ++ai)
@@ -178,7 +240,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			<< tab << tab << "};" << endl;
 		}
 
-		body << tab << tab << "static ::DBus::IntrospectedMethod " << ifaceclass << "_methods[] = " << endl
+		body << tab << tab << "static ::DBus::IntrospectedMethod " << ifaceclass << "_methods[] =" << endl
 		<< tab << tab << "{" << endl;
 
 		// generate the introspect methods
@@ -192,7 +254,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		body << tab << tab << tab << "{ 0, 0 }" << endl
 		<< tab << tab << "};" << endl;
 
-		body << tab << tab << "static ::DBus::IntrospectedMethod " << ifaceclass << "_signals[] = " << endl
+		body << tab << tab << "static ::DBus::IntrospectedMethod " << ifaceclass << "_signals[] =" << endl
 		<< tab << tab << "{" << endl;
 
 		for (Xml::Nodes::iterator si = signals.begin(); si != signals.end(); ++si)
@@ -205,7 +267,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		body << tab << tab << tab << "{ 0, 0 }" << endl
 		<< tab << tab << "};" << endl;
 
-		body << tab << tab << "static ::DBus::IntrospectedProperty " << ifaceclass << "_properties[] = " << endl
+		body << tab << tab << "static ::DBus::IntrospectedProperty " << ifaceclass << "_properties[] =" << endl
 		<< tab << tab << "{" << endl;
 
 		for (Xml::Nodes::iterator pi = properties.begin(); pi != properties.end(); ++pi)
@@ -216,12 +278,12 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			<< "\"" << property.get("name") << "\", "
 			<< "\"" << property.get("type") << "\", "
 			<< (property.get("access").find("read") != string::npos
-			    ? "true"
-			    : "false")
+				? "true"
+				: "false")
 			<< ", "
 			<< (property.get("access").find("write") != string::npos
-			    ? "true"
-			    : "false")
+				? "true"
+				: "false")
 			<< " }," << endl;
 		}
 
@@ -230,7 +292,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		<< tab << tab << "};" << endl;
 
 		// generate the Introspected interface
-		body << tab << tab << "static ::DBus::IntrospectedInterface " << ifaceclass << "_interface = " << endl
+		body << tab << tab << "static ::DBus::IntrospectedInterface " << ifaceclass << "_interface =" << endl
 		<< tab << tab << "{" << endl
 		<< tab << tab << tab << "\"" << ifacename << "\"," << endl
 		<< tab << tab << tab << ifaceclass << "_methods," << endl
@@ -267,61 +329,8 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		<< tab << " */" << endl;
 
 		// generate the methods code
-		for (Xml::Nodes::iterator mi = methods.begin(); mi != methods.end(); ++mi)
-		{
-			Xml::Node &method = **mi;
-			Xml::Nodes args = method["arg"];
-			Xml::Nodes args_in = args.select("direction","in");
-			Xml::Nodes args_out = args.select("direction","out");
+		generate_methods(methods, body);
 
-			body << tab << "virtual ";
-
-			if (args_out.size() == 0 || args_out.size() > 1)
-			{
-				body << "void ";
-			}
-			else if (args_out.size() == 1)
-			{
-				body << signature_to_type(args_out.front()->get("type")) << " ";
-			}
-
-			// generate the method name
-			body << method.get("name") << "(";
-
-			// generate the methods 'in' variables
-			unsigned int i = 0;
-			for (Xml::Nodes::iterator ai = args_in.begin(); ai != args_in.end(); ++ai, ++i)
-			{
-				Xml::Node &arg = **ai;
-				body << "const " << signature_to_type(arg.get("type")) << "& ";
-
-				string arg_name = arg.get("name");
-				if (arg_name.length())
-					body << arg_name;
-
-				if ((i+1 != args_in.size() || args_out.size() > 1))
-					body << ", ";
-			}
-
-			// generate the method 'out' variables if multibe 'out' values exist
-			if (args_out.size() > 1)
-			{
-				unsigned int i = 0;
-				for (Xml::Nodes::iterator ao = args_out.begin(); ao != args_out.end(); ++ao, ++i)
-				{
-					Xml::Node &arg = **ao;
-					body << signature_to_type(arg.get("type")) << "&";
-
-					string arg_name = arg.get("name");
-					if (arg_name.length())
-						body << " " << arg_name;
-
-					if (i+1 != args_out.size())
-						body << ", ";
-				}
-			}
-			body << ") = 0;" << endl;
-		}
 
 		body << endl
 		<< "public:" << endl
@@ -383,11 +392,13 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			Xml::Nodes args_in = args.select("direction","in");
 			Xml::Nodes args_out = args.select("direction","out");
 
-			body << tab << "::DBus::Message " << stub_name(method.get("name")) << "(const ::DBus::CallMessage &call)" << endl
+			body << tab << "::DBus::Message " << stub_name(method.get("name"))
+				 << "(const ::DBus::CallMessage &call)" << endl
 			<< tab << "{" << endl
 			<< tab << tab << "::DBus::MessageIter ri = call.reader();" << endl
 			<< endl;
 
+			body << tab << tab << "::DBus::Error error;" << endl;
 			// generate the 'in' variables
 			unsigned int i = 1;
 			for (Xml::Nodes::iterator ai = args_in.begin(); ai != args_in.end(); ++ai, ++i)
@@ -422,21 +433,26 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			for (unsigned int i = 0; i < args_in.size(); ++i)
 			{
 				body << "argin" << i+1;
-
-				if ((i+1 != args_in.size() || args_out.size() > 1))
-					body << ", ";
+				body << ", ";
 			}
 
 			if (args_out.size() > 1)
 				for (unsigned int i = 0; i < args_out.size(); ++i)
 				{
 					body << "argout" << i+1;
-
-					if (i+1 != args_out.size())
-						body << ", ";
+					body << ", ";
 				}
 
+			body << "error";
 			body << ");" << endl;
+
+			body << tab << tab << "if (error.is_set())" << endl
+				 << tab << tab << "{" << endl
+				 << tab << tab << tab
+				 << "return ::DBus::ErrorMessage(call, error.name(), error.message());"
+				 << endl
+				 << tab << tab << "}" << endl;
+
 
 			body << tab << tab << "::DBus::ReturnMessage reply(call);" << endl;
 

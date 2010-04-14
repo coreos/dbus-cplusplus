@@ -17,24 +17,24 @@ EchoServer::EchoServer(DBus::Connection &connection)
 {
 }
 
-int32_t EchoServer::Random()
+int32_t EchoServer::Random(DBus::Error &error)
 {
 	return rand();
 }
 
-std::string EchoServer::Hello(const std::string &name)
+std::string EchoServer::Hello(const std::string &name, DBus::Error &error)
 {
 	return "Hello " + name + "!";
 }
 
-DBus::Variant EchoServer::Echo(const DBus::Variant &value)
+DBus::Variant EchoServer::Echo(const DBus::Variant &value, DBus::Error &error)
 {
 	this->Echoed(value);
 
 	return value;
 }
 
-std::vector< uint8_t > EchoServer::Cat(const std::string &file)
+std::vector< uint8_t > EchoServer::Cat(const std::string &file, DBus::Error &error)
 {
 	FILE *handle = fopen(file.c_str(), "rb");
 
@@ -49,16 +49,16 @@ std::vector< uint8_t > EchoServer::Cat(const std::string &file)
 	return std::vector< uint8_t > (buff, buff + nread);
 }
 
-int32_t EchoServer::Sum(const std::vector<int32_t>& ints)
+int32_t EchoServer::Sum(const std::vector<int32_t>& ints, DBus::Error &error)
 {
 	int32_t sum = 0;
 
 	for (size_t i = 0; i < ints.size(); ++i) sum += ints[i];
 
-	return sum;	
+	return sum;
 }
 
-std::map< std::string, std::string > EchoServer::Info()
+std::map< std::string, std::string > EchoServer::Info(DBus::Error &error)
 {
 	std::map< std::string, std::string > info;
 	char hostname[HOST_NAME_MAX];
