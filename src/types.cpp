@@ -103,4 +103,3 @@ MessageIter &operator >> (MessageIter &iter, Variant &val)
 
 	return ++iter;
 }
-

@@ -25,8 +25,8 @@
 #ifndef __DBUSXX_EVENTLOOP_INTEGRATION_H
 #define __DBUSXX_EVENTLOOP_INTEGRATION_H
 
+#include <cstring>
 #include <errno.h>
-#include <string.h>
 #include "api.h"
 #include "dispatcher.h"
 #include "util.h"

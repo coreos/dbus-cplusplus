@@ -35,6 +35,23 @@ extern const char *tab;
 extern const char *header;
 extern const char *dbus_includes;
 
+/*
+ * Convert '-' characters found in the XML
+ * introspection into '_' characters, so
+ * that the result will be a legal C++
+ * identifier.
+ */
+static string legalize(string input)
+{
+	size_t pos = 0;
+  
+	while (pos != string::npos) {
+		pos = input.find('-', pos);
+		if (pos != string::npos)
+			input[pos] = '_';
+	}
+	return input;
+}
 
 /*! Generate adaptor code for object methods
   */
@@ -68,7 +85,7 @@ void generate_methods(const Xml::Nodes &methods, ostringstream &body) {
 			Xml::Node &arg = **ai;
 			body << "const " << signature_to_type(arg.get("type")) << "& ";
 
-			string arg_name = arg.get("name");
+			string arg_name = legalize(arg.get("name"));
 			if (arg_name.length())
 				body << arg_name;
 
@@ -84,7 +101,7 @@ void generate_methods(const Xml::Nodes &methods, ostringstream &body) {
 				Xml::Node &arg = **ao;
 				body << signature_to_type(arg.get("type")) << "&";
 
-				string arg_name = arg.get("name");
+				string arg_name = legalize(arg.get("name"));
 				if (arg_name.length())
 					body << " " << arg_name;
 
@@ -96,7 +113,6 @@ void generate_methods(const Xml::Nodes &methods, ostringstream &body) {
 		body << ") = 0;" << endl;
 	}
 }
-
 
 /*! Generate adaptor code for a XML introspection
   */
@@ -181,7 +197,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			Xml::Node &property = **pi;
 
 			body << tab << tab << "bind_property("
-			<< property.get("name") << ", "
+			<< legalize(property.get("name")) << ", "
 			<< "\"" << property.get("type") << "\", "
 			<< (property.get("access").find("read") != string::npos
 				? "true"
@@ -226,7 +242,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 
 				if (arg.get("name").length())
 				{
-					body << "\"" << arg.get("name") << "\", ";
+					body << "\"" << legalize(arg.get("name")) << "\", ";
 				}
 				else
 				{
@@ -275,7 +291,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			Xml::Node &property = **pi;
 
 			body << tab << tab << tab << "{ "
-			<< "\"" << property.get("name") << "\", "
+			<< "\"" << legalize(property.get("name")) << "\", "
 			<< "\"" << property.get("type") << "\", "
 			<< (property.get("access").find("read") != string::npos
 				? "true"
@@ -313,7 +329,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		for (Xml::Nodes::iterator pi = properties.begin(); pi != properties.end(); ++pi)
 		{
 			Xml::Node &property = **pi;
-			string name = property.get("name");
+			string name = legalize(property.get("name"));
 			string type = property.get("type");
 			string type_name = signature_to_type(type);
 
@@ -331,7 +347,6 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		// generate the methods code
 		generate_methods(methods, body);
 
-
 		body << endl
 		<< "public:" << endl
 		<< endl
@@ -344,7 +359,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 			Xml::Node &signal = **si;
 			Xml::Nodes args = signal["arg"];
 
-			body << tab << "void " << signal.get("name") << "(";
+			body << tab << "void " << legalize(signal.get("name")) << "(";
 
 			// generate the signal arguments
 			unsigned int i = 0;
@@ -360,7 +375,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 
 			body << ")" << endl
 			<< tab << "{" << endl
-			<< tab << tab << "::DBus::SignalMessage sig(\"" << signal.get("name") <<"\");" << endl;;
+			<< tab << tab << "::DBus::SignalMessage sig(\"" << legalize(signal.get("name")) <<"\");" << endl;;
 
 			// generate the signal body
 			if (args.size() > 0)

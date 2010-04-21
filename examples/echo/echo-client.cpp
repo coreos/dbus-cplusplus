@@ -3,10 +3,10 @@
 #endif
 
 #include "echo-client.h"
+#include <cstdio>
 #include <iostream>
 #include <pthread.h>
 #include <signal.h>
-#include <stdio.h>
 
 using namespace std;
 

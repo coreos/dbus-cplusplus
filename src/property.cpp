@@ -39,6 +39,7 @@ PropertiesAdaptor::PropertiesAdaptor()
 {
 	register_method(PropertiesAdaptor, Get, Get);
 	register_method(PropertiesAdaptor, Set, Set);
+	register_method(PropertiesAdaptor, GetAll, GetAll);
 }
 
 Message PropertiesAdaptor::Get(const CallMessage &call)
@@ -61,6 +62,9 @@ Message PropertiesAdaptor::Get(const CallMessage &call)
 
 	if (!value)
 		throw ErrorFailed("requested property not found");
+
+        if (value->signature().empty())
+		throw ErrorFailed("requested property has not been initialized");
 
 	on_get_property(*interface, property_name, *value);
 
@@ -96,6 +100,33 @@ Message PropertiesAdaptor::Set(const CallMessage &call)
 	return reply;
 }
 
+Message PropertiesAdaptor::GetAll(const CallMessage &call)
+{
+	MessageIter ri = call.reader();
+
+	std::string iface_name;
+	std::string property_name;
+	Variant value;
+
+	ri >> iface_name;
+
+	InterfaceAdaptor *interface = (InterfaceAdaptor *) find_interface(iface_name);
+
+	if (!interface)
+		throw ErrorFailed("requested interface not found");
+
+        PropertyDict *properties;
+        properties = interface->get_all_properties();
+
+	ReturnMessage reply(call);
+
+	MessageIter wi = reply.writer();
+
+	wi << *properties;
+	delete properties;
+	return reply;
+}
+
 IntrospectedInterface *const PropertiesAdaptor::introspect() const
 {
 	static IntrospectedArgument Get_args[] =
@@ -112,10 +143,17 @@ IntrospectedInterface *const PropertiesAdaptor::introspect() const
 		{ "value", "v", true },
 		{ 0, 0, 0 }
 	};
+	static IntrospectedArgument GetAll_args[] =
+	{
+		{ "interface_name", "s", true },
+		{ "properties", "a{sv}", false },
+		{ 0, 0, 0 }
+	};
 	static IntrospectedMethod Properties_methods[] =
 	{
 		{ "Get", Get_args },
 		{ "Set", Set_args },
+		{ "GetAll", GetAll_args },
 		{ 0, 0 }
 	};
 	static IntrospectedMethod Properties_signals[] =
@@ -152,4 +190,3 @@ void PropertiesProxy::Set(const std::string &iface, const std::string &property,
 {
 //todo
 }
-
