@@ -30,7 +30,6 @@ HEADER_FILES = \
 	$(HEADER_DIR)/object.h \
 	$(HEADER_DIR)/pendingcall.h \
 	$(HEADER_DIR)/server.h \
-	$(HEADER_DIR)/debug.h \
 	$(HEADER_DIR)/util.h \
 	$(HEADER_DIR)/refptr_impl.h \
 	$(HEADER_DIR)/introspection.h \
