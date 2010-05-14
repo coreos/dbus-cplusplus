@@ -1,5 +1,11 @@
 EXTRA_DIST = 
 
+if CROSS_COMPILING
+dbusxx_xml2cpp = dbusxx-xml2cpp
+else
+dbusxx_xml2cpp = $(top_builddir)/tools/dbusxx-xml2cpp
+endif
+
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_builddir)/include $(gtkmm_CFLAGS) -I$(top_srcdir)/tools
 
 if HAVE_GTKMM
@@ -10,7 +16,7 @@ dbus_browser_SOURCES = dbus-glue.h dbus-browser.h dbus-browser.cpp $(top_srcdir)
 dbus_browser_LDADD = $(top_builddir)/src/libdbus-c++-1.la $(gtkmm_LIBS)
 
 dbus-glue.h: $(top_srcdir)/data/org.freedesktop.DBus.xml
-	$(top_builddir)/tools/dbusxx-xml2cpp $^ --proxy=$@
+	$(dbusxx_xml2cpp) $^ --proxy=$@
 
 BUILT_SOURCES = dbus-glue.h
 CLEANFILES = $(BUILT_SOURCES)
