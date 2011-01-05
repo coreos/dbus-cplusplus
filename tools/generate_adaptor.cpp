@@ -151,8 +151,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		string ifacename = iface.get("name");
 
 		// these interface names are skipped.
-		if (ifacename == "org.freedesktop.DBus.Introspectable"
-				||ifacename == "org.freedesktop.DBus.Properties")
+		if (ifacename == "org.freedesktop.DBus.Introspectable")
 		{
 			cerr << "skipping interface " << ifacename << endl;
 			continue;
