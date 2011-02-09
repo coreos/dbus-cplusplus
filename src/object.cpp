@@ -173,11 +173,19 @@ void ObjectAdaptor::register_obj()
 
 void ObjectAdaptor::unregister_obj()
 {
+	if (!is_registered())
+		return;
+
 	_adaptor_table.erase(path());
 
 	debug_log("unregistering local object %s", path().c_str());
 
 	dbus_connection_unregister_object_path(conn()._pvt->conn, path().c_str());
+}
+
+bool ObjectAdaptor::is_registered()
+{
+	return _adaptor_table.find(path()) != _adaptor_table.end();
 }
 
 void ObjectAdaptor::_emit_signal(SignalMessage &sig)
@@ -319,6 +327,11 @@ void ObjectProxy::unregister_obj()
 		++ii;
 	}
 	conn().remove_filter(_filtered);
+}
+
+bool ObjectProxy::is_registered()
+{
+	return true;
 }
 
 Message ObjectProxy::_invoke_method(CallMessage &call)

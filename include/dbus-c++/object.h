@@ -52,11 +52,14 @@ public:
 	
  	inline Connection &conn();
 
+protected:
+	virtual void register_obj() = 0;
+	virtual void unregister_obj() = 0;
+	virtual bool is_registered() = 0;
+
 private:
 
 	DXXAPILOCAL virtual bool handle_message(const Message &) = 0;
-	DXXAPILOCAL virtual void register_obj() = 0;
-	DXXAPILOCAL virtual void unregister_obj() = 0;
 
 private:
 
@@ -151,14 +154,15 @@ protected:
 
 	Continuation *find_continuation(const Tag *tag);
 
+	virtual void register_obj();
+	virtual void unregister_obj();
+	virtual bool is_registered();
+
 private:
 
 	void _emit_signal(SignalMessage &);
 
 	bool handle_message(const Message &);
-
-	void register_obj();
-	void unregister_obj();
 
 	typedef std::map<const Tag *, Continuation *> ContinuationMap;
 	ContinuationMap _continuations;
@@ -206,8 +210,10 @@ private:
 
 	bool handle_message(const Message &);
 
-	void register_obj();
-	void unregister_obj();
+protected:
+	virtual void register_obj();
+	virtual void unregister_obj();
+	virtual bool is_registered();
 
 private:
 
