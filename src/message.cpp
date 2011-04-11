@@ -350,7 +350,8 @@ void MessageIter::copy_data(MessageIter &to)
 			(
 				(DBusMessageIter *)&(to._iter),
 				from.type(),
-				from.type() == DBUS_TYPE_VARIANT ? NULL : sig,
+				from.type() == DBUS_TYPE_DICT_ENTRY ||
+				from.type() == DBUS_TYPE_STRUCT ? NULL : sig,
 				(DBusMessageIter *)&(to_container._iter)
 			);
 
