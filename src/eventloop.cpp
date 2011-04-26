@@ -25,6 +25,9 @@
 #include <config.h>
 #endif
 
+#include <cassert>
+#include <errno.h>
+
 #include <dbus-c++/eventloop.h>
 #include <dbus-c++/debug.h>
 
@@ -77,20 +80,10 @@ DefaultWatch::~DefaultWatch()
 
 DefaultMutex::DefaultMutex()
 {
-	pthread_mutex_init(&_mutex, NULL);
-}
-
-DefaultMutex::DefaultMutex(bool recursive)
-{
-	if (recursive)
-	{
-		pthread_mutex_t recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP; 
- 		_mutex = recmutex;
-	}
-	else
-	{
-		pthread_mutex_init(&_mutex, NULL);
-	}
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+	pthread_mutex_init(&_mutex, &attr);
 }
 
 DefaultMutex::~DefaultMutex()
@@ -100,7 +93,10 @@ DefaultMutex::~DefaultMutex()
 
 void DefaultMutex::lock()
 {
-	pthread_mutex_lock(&_mutex);
+	int r = pthread_mutex_lock(&_mutex);
+	/* This assert is here to avoid a difficult-to-diagnose deadlock. See
+	 * crosbug.com/8486 and crosbug.com/8596. */
+	assert(r != EDEADLK);
 }
 
 void DefaultMutex::unlock()
