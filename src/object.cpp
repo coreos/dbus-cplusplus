@@ -148,10 +148,12 @@ ObjectPathList ObjectAdaptor::child_nodes_from_prefix(const std::string &prefix)
 	return ali;
 }
 
-ObjectAdaptor::ObjectAdaptor(Connection &conn, const Path &path)
+ObjectAdaptor::ObjectAdaptor(Connection &conn, const Path &path,
+                             registration_time reg_time)
 : Object(conn, path, conn.unique_name())
 {
-	register_obj();
+	if (reg_time == REGISTER_NOW)
+		register_obj();
 }
 
 ObjectAdaptor::~ObjectAdaptor()
