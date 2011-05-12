@@ -408,9 +408,11 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 
 			body << tab << "::DBus::Message " << stub_name(method.get("name"))
 				 << "(const ::DBus::CallMessage &call)" << endl
-			<< tab << "{" << endl
-			<< tab << tab << "::DBus::MessageIter ri = call.reader();" << endl
-			<< endl;
+			<< tab << "{" << endl;
+
+			if (args_in.size() > 0)
+				body << tab << tab << "::DBus::MessageIter ri = call.reader();" << endl
+				<< endl;
 
 			body << tab << tab << "::DBus::Error error;" << endl;
 			// generate the 'in' variables
