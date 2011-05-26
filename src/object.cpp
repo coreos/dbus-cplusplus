@@ -154,6 +154,13 @@ ObjectAdaptor::ObjectAdaptor(Connection &conn, const Path &path)
 	register_obj();
 }
 
+ObjectAdaptor::ObjectAdaptor(Connection &conn, const Path &path, registration_time rtime)
+: Object(conn, path, conn.unique_name())
+{
+	if (rtime == REGISTER_NOW)
+		register_obj();
+}
+
 ObjectAdaptor::~ObjectAdaptor()
 {
 	unregister_obj();

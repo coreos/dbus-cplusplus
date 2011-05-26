@@ -117,7 +117,13 @@ public:
 
 	struct Private;
 
+	enum registration_time {
+		REGISTER_NOW,
+		REGISTER_LATER,
+	};
+
 	ObjectAdaptor(Connection &conn, const Path &path);
+	ObjectAdaptor(Connection &conn, const Path &path, registration_time rtime);
 
 	~ObjectAdaptor();
 
