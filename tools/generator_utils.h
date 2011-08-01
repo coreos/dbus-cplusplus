@@ -33,5 +33,6 @@ std::string stub_name(std::string name);
 std::string signature_to_type(const std::string &signature);
 void _parse_signature(const std::string &signature, std::string &type, unsigned int &i);
 void underscorize(std::string &str);
+std::string legalize(const std::string &str);
 
 #endif//__DBUSXX_TOOLS_GENERATOR_UTILS_H

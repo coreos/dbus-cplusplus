@@ -143,7 +143,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 			if (property_access == "read" || property_access == "readwrite")
 			{
 				body << tab << tab << "const " << signature_to_type (property.get("type"))
-				<< " " << prop_name << "() {" << endl;
+				<< " " << legalize(prop_name) << "() {" << endl;
 				body << tab << tab << tab << "::DBus::CallMessage call ;\n ";
 				body << tab << tab << tab
 				<< "call.member(\"Get\"); call.interface(\"org.freedesktop.DBus.Properties\");"
@@ -170,7 +170,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 
 			if (property_access == "write" || property_access == "readwrite")
 			{
-				body << tab << tab << "void " << prop_name << "( const "<< signature_to_type (property.get("type")) << " & input" << ") {" << endl;
+				body << tab << tab << "void " << legalize(prop_name) << "( const "<< signature_to_type (property.get("type")) << " & input" << ") {" << endl;
 				body << tab << tab << tab << "::DBus::CallMessage call ;\n ";
 				body << tab << tab << tab <<"call.member(\"Set\");  call.interface( \"org.freedesktop.DBus.Properties\");"<< endl;
 				body << tab << tab << tab <<"::DBus::MessageIter wi = call.writer(); " << endl;
@@ -222,7 +222,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 
 				string arg_name = arg.get("name");
 				if (arg_name.length())
-					body << arg_name;
+					body << legalize(arg_name);
 				else
 					body << "argin" << i;
 
@@ -240,7 +240,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 
 					string arg_name = arg.get("name");
 					if (arg_name.length())
-						body << " " << arg_name;
+						body << " " << legalize(arg_name);
 					else
 						body << " argout" << i;
 
@@ -265,7 +265,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 				Xml::Node &arg = **ai;
 				string arg_name = arg.get("name");
 				if (arg_name.length())
-					body << tab << tab << "wi << " << arg_name << ";" << endl;
+					body << tab << tab << "wi << " << legalize(arg_name) << ";" << endl;
 				else
 					body << tab << tab << "wi << argin" << j << ";" << endl;
 			}
@@ -295,7 +295,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 
 					string arg_name = arg.get("name");
 					if (arg_name.length())
-						body << tab << tab << "ri >> " << arg.get("name") << ";" << endl;
+						body << tab << tab << "ri >> " << legalize(arg.get("name")) << ";" << endl;
 					else
 						body << tab << tab << "ri >> argout" << i << ";" << endl;
 				}
@@ -329,7 +329,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 
 				string arg_name = arg.get("name");
 				if (arg_name.length())
-					body << arg_name;
+					body << legalize(arg_name);
 				else
 					body << "argin" << i;
 
@@ -369,7 +369,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 
 				string arg_name = arg.get("name");
 				if (arg_name.length())
-					body << arg_name << ";" << " ri >> " << arg_name << ";" << endl;
+					body << legalize(arg_name) << ";" << " ri >> " << legalize(arg_name) << ";" << endl;
 				else
 					body << "arg" << i << ";" << " ri >> " << "arg" << i << ";" << endl;
 			}
@@ -384,7 +384,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 
 				string arg_name = arg.get("name");
 				if (arg_name.length())
-					body << arg_name;
+					body << legalize(arg_name);
 				else
 					body << "arg" << j;
 

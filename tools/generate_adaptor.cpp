@@ -35,24 +35,6 @@ extern const char *tab;
 extern const char *header;
 extern const char *dbus_includes;
 
-/*
- * Convert '-' characters found in the XML
- * introspection into '_' characters, so
- * that the result will be a legal C++
- * identifier.
- */
-static string legalize(string input)
-{
-	size_t pos = 0;
-  
-	while (pos != string::npos) {
-		pos = input.find('-', pos);
-		if (pos != string::npos)
-			input[pos] = '_';
-	}
-	return input;
-}
-
 /*! Generate adaptor code for object methods
   */
 void generate_methods(const Xml::Nodes &methods, ostringstream &body) {

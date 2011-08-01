@@ -50,6 +50,18 @@ void underscorize(string &str)
 	}
 }
 
+std::string legalize(const std::string &str)
+{
+	string legal = str;
+	underscorize(legal);
+	// TODO: Check for other C++ keywords, as needed.
+	if (legal == "new")
+	{
+		legal = "_" + legal;
+	}
+	return legal;
+}
+
 string stub_name(string name)
 {
 	underscorize(name);
