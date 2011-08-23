@@ -56,7 +56,6 @@ public:
 	const char *message() const;
 
 	void set(const char *name, const char *message);
-	// parameters MUST be static strings
 
 	bool is_set() const;
 
