@@ -59,7 +59,7 @@ public:
 
 protected:
 
-	Server(const Server &s)
+	Server(const Server &/*s*/)
 	{}
 
 	virtual void on_new_connection(Connection &c) = 0;
