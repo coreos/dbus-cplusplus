@@ -61,7 +61,7 @@ Message IntrospectableAdaptor::Introspect(const CallMessage &call)
 	{
 		debug_log("introspecting interface %s", iti->first.c_str());
 
-		IntrospectedInterface *const intro = iti->second->introspect();
+		const IntrospectedInterface *intro = iti->second->introspect();
 		if (intro)
 		{
 			xml << "\n\t<interface name=\"" << intro->name << "\">";
@@ -144,7 +144,7 @@ Message IntrospectableAdaptor::Introspect(const CallMessage &call)
 	return reply;
 }
 
-IntrospectedInterface *const IntrospectableAdaptor::introspect() const
+const IntrospectedInterface *IntrospectableAdaptor::introspect() const
 {
 	static IntrospectedArgument Introspect_args[] =
 	{

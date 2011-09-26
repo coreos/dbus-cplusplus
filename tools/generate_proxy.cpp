@@ -141,7 +141,11 @@ void generate_proxy(Xml::Document &doc, const char *filename)
 			string property_access = property.get ("access");
 			if (property_access == "read" || property_access == "readwrite")
 			{
-				body << tab << tab << "const " << signature_to_type (property.get("type"))
+				body << tab << tab;
+				if (!is_primitive_type(property.get("type"))) {
+					body << "const ";
+				}
+				body << signature_to_type(property.get("type"))
 				<< " " << legalize(prop_name) << "() {" << endl;
 				body << tab << tab << tab << "::DBus::CallMessage call ;\n ";
 				body << tab << tab << tab

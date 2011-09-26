@@ -146,7 +146,7 @@ public:
 
 	PropertyDict *get_all_properties();
 
-	virtual IntrospectedInterface *const introspect() const
+	virtual const IntrospectedInterface *introspect() const
 	{
 		return NULL;
 	}

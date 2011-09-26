@@ -176,3 +176,31 @@ string signature_to_type(const string &signature)
 	_parse_signature(signature, type, i);
 	return type;
 }
+
+bool is_primitive_type(const string &signature) {
+	unsigned int len = signature.length();
+
+	if (len == 0) {
+		cerr << "invalid signature" << endl;
+		exit(-1);
+	}
+
+	if (len > 1) {
+		return false;
+	}
+
+	switch (signature[0]) {
+		case 'y':  // uint8_t
+		case 'b':  // bool
+		case 'n':  // int16_t
+		case 'q':  // uint16_t
+		case 'i':  // int32_t
+		case 'u':  // uint32_t
+		case 'x':  // int64_t
+		case 't':  // uint64_t
+		case 'd':  // double
+			return true;
+		default:
+			return false;
+	}
+}

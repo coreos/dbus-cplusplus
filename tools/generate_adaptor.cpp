@@ -203,7 +203,7 @@ void generate_adaptor(Xml::Document &doc, const char *filename)
 		body << tab << "}" << endl
 		<< endl;
 
-		body << tab << "::DBus::IntrospectedInterface *const introspect() const " << endl
+		body << tab << "const ::DBus::IntrospectedInterface *introspect() const " << endl
 		<< tab << "{" << endl;
 
 		// generate the introspect arguments

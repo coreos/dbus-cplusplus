@@ -31,6 +31,7 @@
 const char *atomic_type_to_string(char t);
 std::string stub_name(std::string name);
 std::string signature_to_type(const std::string &signature);
+bool is_primitive_type(const std::string &signature);
 void _parse_signature(const std::string &signature, std::string &type, unsigned int &i);
 void underscorize(std::string &str);
 std::string legalize(const std::string &str);
