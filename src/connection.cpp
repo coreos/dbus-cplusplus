@@ -375,15 +375,17 @@ Message Connection::send_blocking(Message &msg, int timeout)
 	return Message(new Message::Private(reply), false);
 }
 
-PendingCall Connection::send_async(Message &msg, int timeout)
+PendingCall *Connection::send_async(Message &msg, int timeout)
 {
 	DBusPendingCall *pending;
 
+	// TODO(ers) At the moment using a timeout other than -1
+	// results in a deadlock if the timeout expires.
 	if (!dbus_connection_send_with_reply(_pvt->conn, msg._pvt->msg, &pending, timeout))
 	{
 		throw ErrorNoMemory("Unable to start asynchronous call");
 	}
-	return PendingCall(new PendingCall::Private(pending));
+	return new PendingCall(new PendingCall::Private(pending));
 }
 
 void Connection::request_name(const char *name, int flags)

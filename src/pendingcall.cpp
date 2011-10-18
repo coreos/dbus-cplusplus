@@ -48,22 +48,20 @@ PendingCall::Private::~Private()
 {
 	if (dataslot != -1)
 	{
-		dbus_pending_call_allocate_data_slot(&dataslot);
+		dbus_pending_call_free_data_slot(&dataslot);
 	}
 }
 
 void PendingCall::Private::notify_stub(DBusPendingCall *dpc, void *data)
 {
-	PendingCall::Private *pvt = static_cast<PendingCall::Private *>(data);
-
-	PendingCall pc(pvt);
-	pvt->slot(pc);
+	PendingCall *pc = static_cast<PendingCall*>(data);
+	pc->_pvt->reply_handler(pc);
 }
 
 PendingCall::PendingCall(PendingCall::Private *p)
 : _pvt(p)
 {
-	if (!dbus_pending_call_set_notify(_pvt->call, Private::notify_stub, p, NULL))
+	if (!dbus_pending_call_set_notify(_pvt->call, Private::notify_stub, this, NULL))
 	{
 		throw ErrorNoMemory("Unable to initialize pending call");
 	}
@@ -119,9 +117,14 @@ void *PendingCall::data()
 	return dbus_pending_call_get_data(_pvt->call, _pvt->dataslot);
 }
 
-Slot<void, PendingCall &>& PendingCall::slot()
+AsyncReplyHandler& PendingCall::reply_handler()
 {
-	return _pvt->slot;
+	return _pvt->reply_handler;
+}
+
+void PendingCall::reply_handler(const AsyncReplyHandler& handler)
+{
+	_pvt->reply_handler = handler;
 }
 
 Message PendingCall::steal_reply()
@@ -139,4 +142,3 @@ Message PendingCall::steal_reply()
 
 	return Message(new Message::Private(dmsg));
 }
-

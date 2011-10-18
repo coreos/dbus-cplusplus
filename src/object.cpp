@@ -300,9 +300,40 @@ ObjectProxy::ObjectProxy(Connection &conn, const Path &path, const char *service
 	register_obj();
 }
 
+// TODO(ers@google.com): unregister_obj() makes a synchronous
+// dbus method call, which can result in a deadlock if the
+// ObjectProxy is deleted while in a callback from a signal
+// or a pending call reply.
 ObjectProxy::~ObjectProxy()
 {
+	cancel_pending_calls();
 	unregister_obj();
+}
+
+void ObjectProxy::cancel_pending_calls()
+{
+	PendingCallList::const_iterator pi = _pending_calls.begin();
+	while (pi != _pending_calls.end())
+	{
+		(*pi)->cancel();
+		delete *pi;
+		++pi;
+	}
+	_pending_calls.clear();
+}
+
+void ObjectProxy::_remove_pending_call(PendingCall *pending)
+{
+	PendingCallList::iterator pi = _pending_calls.begin();
+	while (pi != _pending_calls.end())
+	{
+		if (*pi == pending)
+		{
+			_pending_calls.erase(pi);
+			break;
+		}
+	}
+	delete pending;
 }
 
 void ObjectProxy::register_obj()
@@ -361,6 +392,19 @@ bool ObjectProxy::_invoke_method_noreply(CallMessage &call)
 		call.destination(service().c_str());
 
 	return conn().send(call);
+}
+
+PendingCall *ObjectProxy::_invoke_method_async(CallMessage &call, int timeout)
+{
+	if (call.path() == NULL)
+		call.path(path().c_str());
+
+	if (call.destination() == NULL)
+		call.destination(service().c_str());
+
+	PendingCall *pending = conn().send_async(call, timeout);
+	_pending_calls.push_back(pending);
+	return pending;
 }
 
 bool ObjectProxy::handle_message(const Message &msg)

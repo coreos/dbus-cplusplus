@@ -27,6 +27,7 @@
 
 #include <dbus-c++/debug.h>
 #include <dbus-c++/interface.h>
+#include <dbus-c++/pendingcall.h>
 
 #include "internalerror.h"
 
@@ -188,4 +189,19 @@ bool InterfaceProxy::invoke_method_noreply(const CallMessage &call)
 		call2.interface(name().c_str());
 
 	return _invoke_method_noreply(call2);
+}
+
+PendingCall *InterfaceProxy::invoke_method_async(const CallMessage &call, int timeout)
+{
+	CallMessage &call2 = const_cast<CallMessage &>(call);
+
+	if (call.interface() == NULL)
+		call2.interface(name().c_str());
+
+	return _invoke_method_async(call2, timeout);
+}
+
+void InterfaceProxy::remove_pending_call(PendingCall *pending)
+{
+	_remove_pending_call(pending);
 }

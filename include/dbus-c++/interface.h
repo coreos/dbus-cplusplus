@@ -51,6 +51,7 @@ class IntrospectedInterface;
 class ObjectAdaptor;
 class InterfaceAdaptor;
 class SignalMessage;
+class PendingCall;
 
 typedef std::map<std::string, InterfaceAdaptor *> InterfaceAdaptorTable;
 
@@ -97,6 +98,22 @@ protected:
 	virtual Message _invoke_method(CallMessage &) = 0;
 	
 	virtual bool _invoke_method_noreply(CallMessage &call) = 0;
+
+	/*!
+	 * \brief Perform a non-blocking method invocation.
+	 * \details Queues a message to send, as with _invoke_method(), but instead
+	 * of blocking to wait for a reply, immediately returns a DBus::PendingCall
+	 * used to receive the reply asynchronously.
+	 *
+	 * The PendingCall is owned by the caller, and must be disposed of using
+	 * _remove_pending_call().
+	 */
+	virtual PendingCall *_invoke_method_async(CallMessage &call, int timeout = -1) = 0;
+	/*!
+	 * \brief Deletes the supplied PendingCall without cancelling it.
+	 * \param pending The PendingCall to be deleted.
+	 */
+	virtual void _remove_pending_call(PendingCall *pending) = 0;
 
 	InterfaceProxyTable _interfaces;
 };
@@ -172,9 +189,25 @@ public:
 
 	bool invoke_method_noreply(const CallMessage &call);
 
+	/*!
+	 * \brief Perform a non-blocking method invocation.
+	 * \details Queues a message to send, as with invoke_method(), but instead
+	 * of blocking to wait for a reply, immediately returns a DBus::PendingCall
+	 * used to receive the reply asynchronously.
+	 *
+	 * The PendingCall is owned by the caller, and must be disposed of using
+	 * remove_pending_call().
+	 */
+	PendingCall *invoke_method_async(const CallMessage &call, int timeout = -1);
+
 	bool dispatch_signal(const SignalMessage &);
 
 protected:
+	/*!
+	 * \brief Deletes the supplied PendingCall without cancelling it.
+	 * \param pending The PendingCall to be deleted.
+	 */
+	void remove_pending_call(PendingCall *pending);
 
 	SignalTable	_signals;
 };

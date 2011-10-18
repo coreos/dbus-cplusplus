@@ -198,6 +198,14 @@ class ObjectProxy;
 
 typedef std::list<ObjectProxy *> ObjectProxyPList;
 
+/*!
+ * \brief An ObjectProxy wraps a dbus object on which methods can
+ * be invoked and signals can be received.
+ *
+ * ObjectProxy objects should not be deleted while in a callback
+ * handling either a signal or a pending call reply. Doing so may
+ * result in a deadlock.
+ */
 class DXXAPI ObjectProxy : public Object, public virtual ProxyBase
 {
 public:
@@ -214,16 +222,23 @@ private:
     
 	bool _invoke_method_noreply(CallMessage &call);
 
+	PendingCall *_invoke_method_async(CallMessage &call, int timeout = -1);
+
 	bool handle_message(const Message &);
 
 protected:
 	virtual void register_obj();
 	virtual void unregister_obj();
 	virtual bool is_registered();
+	virtual void _remove_pending_call(PendingCall *pending);
 
 private:
+	void cancel_pending_calls();
 
 	MessageSlot _filtered;
+
+	typedef std::vector<PendingCall*> PendingCallList;
+	PendingCallList _pending_calls;
 };
 
 const ObjectProxy *ObjectProxy::object() const

@@ -42,7 +42,7 @@ using namespace DBus;
 
 void usage(const char *argv0)
 {
-	cerr << endl << "Usage: " << argv0 << " <xmlfile> [ --proxy=<outfile.h> ] [ --adaptor=<outfile.h> ]"
+	cerr << endl << "Usage: " << argv0 << " <xmlfile> [ --proxy=<outfile.h> [ --[no]sync ] [ --[no]async ] [ --adaptor=<outfile.h> ]"
 	     << endl << endl;
 	exit(-1);
 }
@@ -70,9 +70,11 @@ int main(int argc, char ** argv)
 		usage(argv[0]);
 	}
 
-	bool proxy_mode, adaptor_mode;
+	bool proxy_mode, adaptor_mode, async_proxy_mode, sync_proxy_mode;
 	char *proxy, *adaptor;
 
+	sync_proxy_mode = true;
+	async_proxy_mode = false;
 	proxy_mode = false;
 	proxy = 0;
 
@@ -86,11 +88,26 @@ int main(int argc, char ** argv)
 			proxy_mode = true;
 			proxy = argv[a] +8;
 		}
-		else
-		if (!strncmp(argv[a], "--adaptor=", 10))
+		else if (!strncmp(argv[a], "--adaptor=", 10))
 		{
 			adaptor_mode = true;
 			adaptor = argv[a] +10;
+		}
+		else if (!strcmp(argv[a], "--async"))
+		{
+			async_proxy_mode = true;
+		}
+		else if (!strcmp(argv[a], "--sync"))
+		{
+			sync_proxy_mode = true;
+		}
+		else if (!strcmp(argv[a], "--noasync"))
+		{
+			async_proxy_mode = false;
+		}
+		else if (!strcmp(argv[a], "--nosync"))
+		{
+			sync_proxy_mode = false;
 		}
 	}
 
@@ -123,8 +140,8 @@ int main(int argc, char ** argv)
 		return -1;
 	}
 
-	if (proxy_mode)   generate_proxy(doc, proxy);
-	if (adaptor_mode) generate_adaptor(doc, adaptor);
+	if (proxy_mode)       generate_proxy(doc, proxy, sync_proxy_mode, async_proxy_mode);
+	if (adaptor_mode)     generate_adaptor(doc, adaptor);
 
 	return 0;
 }

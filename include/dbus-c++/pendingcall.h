@@ -32,6 +32,9 @@
 namespace DBus {
 
 class Connection;
+class PendingCall;
+
+typedef Slot<void, PendingCall *> AsyncReplyHandler;
 
 class DXXAPI PendingCall
 {
@@ -66,7 +69,7 @@ public:
 	 * Note that canceling a pending call will not simulate a timed-out call; if a 
 	 * call times out, then a timeout error reply is received. If you cancel the 
 	 * call, no reply is received unless the the reply was already received before 
-	 * you canceled.
+	 * you cancelled.
 	 */
 	void cancel();
 
@@ -86,7 +89,7 @@ public:
 	 *        be used for freeing the data when the data is set again, or when the
 	 *        pending call is finalized.
 	 *
-	 * The slot is allocated automatic.
+	 * The slot is allocated automatically.
 	 *
 	 * \param data The data to store.
 	 * \throw ErrorNoMemory
@@ -103,12 +106,26 @@ public:
 	void *data();
 
 	/*!
-	 * \return The data slot.
+	 * \return The reply handler slot.
 	 */
-	Slot<void, PendingCall &>& slot();
+	AsyncReplyHandler& reply_handler();
 
 	/*!
-	 * \brief Gets the reply
+	 * \brief Sets a callback to handle an asynchronous reply to a method
+	 * invocation.
+	 *
+	 * If the pending call has not been cancelled, the supplied callback will
+	 * be invoked when a reply is received. The callback is a templated
+	 * class, where the two template arguments are the type of the single
+	 * argument taken by the handler function, and the return type of that
+	 * function.
+	 *
+	 * \param handler The callback.
+	 */
+	void reply_handler(const AsyncReplyHandler& handler);
+
+	/*!
+	 * \brief Gets the reply message
 	 *
 	 * Ownership of the reply message passes to the caller. This function can only 
 	 * be called once per pending call, since the reply message is tranferred to 

@@ -377,13 +377,14 @@ public:
 	 *
 	 * \param msg The Message to write.
 	 * \param timeout Timeout in milliseconds (omit for default).
+	 * \return The reply Message, which may be an ErrorMessage.
 	 * \throw Error
 	 */
 	Message send_blocking( Message& msg, int timeout = -1);
     
 	/*!
 	 * \brief Queues a message to send, as with send(), but also 
-	 *        returns a DBusPendingCall used to receive a reply to the message.
+	 *        returns a DBus::PendingCall used to receive a reply to the message.
 	 *
 	 * If no reply is received in the given timeout_milliseconds, this function 
 	 * expires the pending reply and generates a synthetic error reply (generated 
@@ -404,13 +405,20 @@ public:
 	 *
 	 * \param msg The Message to write.
 	 * \param timeout Timeout in milliseconds (omit for default).
+	 * \return The PendingCall. The PendingCall::reply_handler() method can be used to
+	 * set a callback to be invoked when the reply is received. The pending
+	 * call is owned by the application's ObjectProxy class. Once
+	 * the handler is done with the PendingCall, it should dispose of it by
+	 * calling InterfaceProxy::remove_pending_call(). The pending
+	 * call is <em>not</em> cancelled when the PendingCall object is deleted.
+	 * Instead, the PendingCall::cancel() method must be used.
 	 * \throw ErrorNoMemory
 	 */
-	PendingCall send_async( Message& msg, int timeout = -1);
+	PendingCall *send_async(Message& msg, int timeout = -1);
 
 	void request_name( const char* name, int flags = 0 );
     
-    unsigned long sender_unix_uid(const char *sender);
+	unsigned long sender_unix_uid(const char *sender);
 
 	/*!
 	 * \brief Asks the bus whether a certain name has an owner.

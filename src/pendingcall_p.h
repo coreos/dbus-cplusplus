@@ -40,7 +40,7 @@ struct DXXAPILOCAL PendingCall::Private
 {
 	DBusPendingCall *call;
 	int dataslot;
-	Slot<void, PendingCall &> slot;
+	AsyncReplyHandler reply_handler;
 	
 	Private(DBusPendingCall *);
 
