@@ -308,18 +308,19 @@ static bool is_basic_type(int typecode)
 {
 	switch (typecode)
 	{
-		case 'y':
-		case 'b':
-		case 'n':
-		case 'q':
-		case 'i':
-		case 'u':
-		case 'x':
-		case 't':
-		case 'd':
-		case 's':
-		case 'o':
-		case 'g':
+		case DBUS_TYPE_BYTE:
+		case DBUS_TYPE_BOOLEAN:
+		case DBUS_TYPE_INT16:
+		case DBUS_TYPE_UINT16:
+		case DBUS_TYPE_INT32:
+		case DBUS_TYPE_UINT32:
+		case DBUS_TYPE_INT64:
+		case DBUS_TYPE_UINT64:
+		case DBUS_TYPE_DOUBLE:
+		case DBUS_TYPE_STRING:
+		case DBUS_TYPE_OBJECT_PATH:
+		case DBUS_TYPE_SIGNATURE:
+		case DBUS_TYPE_UNIX_FD:
 			return true;
 		default:
 			return false;

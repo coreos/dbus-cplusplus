@@ -24,6 +24,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <dbus/dbus.h>		// for DBUS_TYPE_*
+
 #include "generator_utils.h"
 
 using namespace std;
@@ -73,19 +75,21 @@ const char *atomic_type_to_string(char t)
 {
 	static struct { char type; const char *name; } atos[] =
 	{
-		{ 'y', "uint8_t" },
-		{ 'b', "bool" },
-		{ 'n', "int16_t" },
-		{ 'q', "uint16_t" },
-		{ 'i', "int32_t" },
-		{ 'u', "uint32_t" },
-		{ 'x', "int64_t" },
-		{ 't', "uint64_t" },
-		{ 'd', "double" },
-		{ 's', "std::string" },
-		{ 'o', "::DBus::Path" },
-		{ 'g', "::DBus::Signature" },
-		{ 'v', "::DBus::Variant" },
+		{ DBUS_TYPE_BYTE, "uint8_t" },
+		{ DBUS_TYPE_BOOLEAN, "bool" },
+		{ DBUS_TYPE_INT16, "int16_t" },
+		{ DBUS_TYPE_UINT16, "uint16_t" },
+		{ DBUS_TYPE_INT32, "int32_t" },
+		{ DBUS_TYPE_UINT32, "uint32_t" },
+		{ DBUS_TYPE_INT64, "int64_t" },
+		{ DBUS_TYPE_UINT64, "uint64_t" },
+		{ DBUS_TYPE_DOUBLE, "double" },
+		{ DBUS_TYPE_STRING, "std::string" },
+		/* Unix fds are passed to/from methods as integers */
+		{ DBUS_TYPE_UNIX_FD, "int" },
+		{ DBUS_TYPE_OBJECT_PATH, "::DBus::Path" },
+		{ DBUS_TYPE_SIGNATURE, "::DBus::Signature" },
+		{ DBUS_TYPE_VARIANT, "::DBus::Variant" },
 		{ '\0', "" }
 	};
 	int i;
