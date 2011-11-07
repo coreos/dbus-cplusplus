@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<node name="/org/freedesktop/DBus/Examples/Async">
+  <interface name="org.freedesktop.DBus.AsyncDemo">
+    <method name="Hello">
+      <arg type="s" name="name" direction="in"/>
+      <arg type="s" name="greeting" direction="out"/>
+    </method>
+    <method name="Sum">
+      <arg type="ai" name="ints" direction="in"/>
+      <arg type="i" name="sum" direction="out"/>
+    </method>
+    <method name="SplitString">
+      <arg type="s" name="wi" direction="in"/>
+      <arg type="s" name="out-string1" direction="out"/>
+      <arg type="s" name="out-string2" direction="out"/>
+    </method>
+    <method name="TimedWait">
+      <arg type="i" name="seconds" direction="in"/>
+    </method>
+  </interface>
+</node>
