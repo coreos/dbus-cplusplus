@@ -33,7 +33,7 @@
 namespace DBus {
 
 class Message;
-class InternalError;
+struct InternalError;
 
 class DXXAPI Error : public std::exception
 {

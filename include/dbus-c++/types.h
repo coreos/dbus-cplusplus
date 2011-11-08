@@ -184,6 +184,8 @@ struct type< Struct<T1,T2,T3,T4,T5,T6,T7,T8> >
 
 } /* namespace DBus */
 
+extern DXXAPI DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Variant &val);
+
 inline DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Invalid &)
 {
 	return iter;
@@ -330,8 +332,6 @@ inline DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Stru
 
 	return iter;
 }
-
-extern DXXAPI DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Variant &val);
 
 /*
  */
@@ -497,4 +497,3 @@ inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Struct<T1,
 extern DXXAPI DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Variant &val);
 	
 #endif//__DBUSXX_TYPES_H
-

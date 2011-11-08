@@ -46,7 +46,7 @@ struct DXXAPI PropertyData
 
 typedef std::map<std::string, PropertyData>	PropertyTable;
 
-class IntrospectedInterface;
+struct IntrospectedInterface;
 
 class ObjectAdaptor;
 class InterfaceAdaptor;
