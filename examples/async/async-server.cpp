@@ -48,7 +48,7 @@ void AsyncServer::SplitString(const std::string& input, std::string &string1, st
 	}
 }
 
-void AsyncServer::TimedWait(const int32_t &seconds, DBus::Error &error)
+void AsyncServer::Timed_Wait(const int32_t &seconds, DBus::Error &error)
 {
 	if (seconds)
 		sleep(seconds);

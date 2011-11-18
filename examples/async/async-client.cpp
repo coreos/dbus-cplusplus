@@ -43,16 +43,21 @@ void AsyncClient::SplitStringCallback(const std::string& string1,
 		     << ": " << e.message() << endl;
 	else
 		cout << "reply from SplitString: \"" << string1 << "\" \""
-       		     << string2 << "\"" << endl;
+		     << string2 << "\"" << endl;
 	cout << "  data = " << data << endl;
 }
 
 DBus::BusDispatcher dispatcher;
 
-void AsyncClient::TimedWaitCallback(const ::DBus::Error& e, void *data)
+void AsyncClient::Timed_WaitCallback(const ::DBus::Error& e, void *data)
 {
-	cout << "reply from TimedWait" << endl;
+	cout << "reply from Timed_Wait" << endl;
 	dispatcher.leave();
+}
+
+void AsyncClient::Change_Sig(const std::string& newval)
+{
+	cout << "Change_Sig signal with newval=" << newval << endl;
 }
 
 void *do_method_calls(void *arg)
@@ -78,8 +83,8 @@ void *do_method_calls(void *arg)
 	client->SplitString("", NULL);
 	cout << "Called SplitString method with empty string" << endl;
 
-	client->TimedWait(4, NULL);
-	cout << "Called TimedWait" << endl;
+	client->Timed_Wait(4, NULL);
+	cout << "Called Timed_Wait" << endl;
 
 	cout << "done " << endl;
 

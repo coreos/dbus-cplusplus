@@ -7,6 +7,8 @@ AM_CPPFLAGS = \
 	$(xml_CFLAGS) \
 	-I$(top_srcdir)/include \
 	-I$(top_builddir)/include \
+	-I$(top_builddir)/ctemplate \
+	-DDATADIR=\"$(pkgdatadir)/\"
 	-Wall
 
 if CROSS_COMPILING
@@ -18,12 +20,13 @@ endif
 bin_PROGRAMS = dbusxx-xml2cpp dbusxx-introspect
 
 dbusxx_xml2cpp_SOURCES = xml.h xml.cpp xml2cpp.h xml2cpp.cpp \
-	generate_adaptor.cpp  generate_adaptor.h  generate_proxy.cpp\
-	generate_proxy.h  generator_utils.cpp  generator_utils.h
-dbusxx_xml2cpp_LDADD = $(libdbus_cxx_la) $(xml_LIBS)
+	generate_stubs.cpp generate_stubs.h  generator_utils.cpp  generator_utils.h
+dbusxx_xml2cpp_LDADD = $(libdbus_cxx_la) $(xml_LIBS) -lctemplate_nothreads
 
 dbusxx_introspect_SOURCES = introspect.h introspect.cpp
 dbusxx_introspect_LDADD = $(libdbus_cxx_la)
+
+pkgdata_DATA = proxy-stubs.tpl adaptor-stubs.tpl
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

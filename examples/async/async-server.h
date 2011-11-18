@@ -19,7 +19,7 @@ public:
 
         virtual void SplitString(const std::string& input, std::string &string1, std::string &string2, DBus::Error &error);
 
-	virtual void TimedWait(const int32_t &seconds, DBus::Error &error);
+	virtual void Timed_Wait(const int32_t &seconds, DBus::Error &error);
 };
 
 #endif//__DEMO_ASYNC_SERVER_H

@@ -18,7 +18,9 @@ public:
         virtual void HelloCallback(const std::string& greeting, const ::DBus::Error& e, void* data);
         virtual void SumCallback(const int32_t& sum, const ::DBus::Error& e, void* data);
         virtual void SplitStringCallback(const std::string& out_string1, const std::string& out_string2, const ::DBus::Error& e, void* data);
-	virtual void TimedWaitCallback(const ::DBus::Error& e, void* data);
+	virtual void Timed_WaitCallback(const ::DBus::Error& e, void* data);
+
+	virtual void Change_Sig(const std::string& newval);
 };
 
 #endif//__DEMO_ASYNC_CLIENT_H

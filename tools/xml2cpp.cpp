@@ -30,20 +30,28 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <ctemplate/template.h>
 
 #include "xml2cpp.h"
-#include "generate_adaptor.h"
-#include "generate_proxy.h"
+#include "generate_stubs.h"
 
+using namespace ctemplate;
 using namespace std;
 using namespace DBus;
 
 //typedef map<string,string> TypeCache;
 
-void usage(const char *argv0)
+void usage(char *argv0)
 {
-	cerr << endl << "Usage: " << argv0 << " <xmlfile> [ --proxy=<outfile.h> [ --[no]sync ] [ --[no]async ] [ --adaptor=<outfile.h> ]"
-	     << endl << endl;
+	char *prog = strrchr(argv0, '/');
+	if (prog == NULL)
+		prog = argv0;
+	else
+		++prog;
+	cerr << endl << "Usage: " << endl;
+	cerr << "  " << prog << " <xmlfile> --proxy=<outfile.h> [ --proxy-template=<template.tpl> ] [ --templatedir=<template-dir> ] [ --[no]sync ] [ --[no]async ]" << endl << endl;
+	cerr << "  --OR--" << endl << endl;
+	cerr << "  " << prog << " <xmlfile> --adaptor=<outfile.h> [ --adaptor-template=<template.tpl> ] [ --templatedir=<template-dir> ]" << endl;
 	exit(-1);
 }
 
@@ -72,6 +80,8 @@ int main(int argc, char ** argv)
 
 	bool proxy_mode, adaptor_mode, async_proxy_mode, sync_proxy_mode;
 	char *proxy, *adaptor;
+	const char *proxy_template = "proxy-stubs.tpl";
+	const char *adaptor_template = "adaptor-stubs.tpl";
 
 	sync_proxy_mode = true;
 	async_proxy_mode = false;
@@ -80,18 +90,30 @@ int main(int argc, char ** argv)
 
 	adaptor_mode = false;
 	adaptor = 0;
-	
+
 	for (int a = 1; a < argc; ++a)
 	{
 		if (!strncmp(argv[a], "--proxy=", 8))
 		{
 			proxy_mode = true;
-			proxy = argv[a] +8;
+			proxy = argv[a] + 8;
 		}
 		else if (!strncmp(argv[a], "--adaptor=", 10))
 		{
 			adaptor_mode = true;
-			adaptor = argv[a] +10;
+			adaptor = argv[a] + 10;
+		}
+		else if (!strncmp(argv[a], "--proxy-template=", 17))
+		{
+			proxy_template = argv[a] + 17;
+		}
+		else if (!strncmp(argv[a], "--adaptor-template=", 19))
+		{
+			adaptor_template = argv[a] + 19;
+		}
+		else if (!strncmp(argv[a], "--templatedir=", 14))
+		{
+			Template::AddAlternateTemplateRootDirectory(argv[a] + 14);
 		}
 		else if (!strcmp(argv[a], "--async"))
 		{
@@ -110,8 +132,10 @@ int main(int argc, char ** argv)
 			sync_proxy_mode = false;
 		}
 	}
+	Template::AddAlternateTemplateRootDirectory(DATADIR);
 
-	if (!proxy_mode && !adaptor_mode) usage(argv[0]);
+	if ((!proxy_mode && !adaptor_mode) || (proxy_mode && adaptor_mode))
+		usage(argv[0]);
 
 	ifstream xmlfile(argv[1]);
 
@@ -140,8 +164,10 @@ int main(int argc, char ** argv)
 		return -1;
 	}
 
-	if (proxy_mode)       generate_proxy(doc, proxy, sync_proxy_mode, async_proxy_mode);
-	if (adaptor_mode)     generate_adaptor(doc, adaptor);
+	if (proxy_mode)
+		generate_stubs(doc, proxy, sync_proxy_mode, async_proxy_mode, proxy_template);
+	else if (adaptor_mode)
+		generate_stubs(doc, adaptor, true, true, adaptor_template);
 
 	return 0;
 }

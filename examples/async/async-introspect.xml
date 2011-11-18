@@ -14,8 +14,14 @@
       <arg type="s" name="out-string1" direction="out"/>
       <arg type="s" name="out-string2" direction="out"/>
     </method>
-    <method name="TimedWait">
+    <method name="Timed.Wait">
       <arg type="i" name="seconds" direction="in"/>
     </method>
+    <signal name="Change.Sig">
+      <arg name="newval" type="s"/>
+    </signal>
+    <property name="xprop" type="a{sv}" access="read"/>
+    <property name="yprop" type="a{sv}" access="write"/>
+    <property name="zprop" type="a{sv}" access="readwrite"/>
   </interface>
 </node>
