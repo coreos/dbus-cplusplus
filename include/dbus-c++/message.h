@@ -105,6 +105,10 @@ public:
 	const char *get_signature();
 
 	char *signature() const; //returned string must be manually free()'d
+
+	int get_fd();
+
+	bool append_fd(int fd);
 	
 	MessageIter recurse();
 

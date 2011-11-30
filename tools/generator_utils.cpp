@@ -85,8 +85,7 @@ const char *atomic_type_to_string(char t)
 		{ DBUS_TYPE_UINT64, "uint64_t" },
 		{ DBUS_TYPE_DOUBLE, "double" },
 		{ DBUS_TYPE_STRING, "std::string" },
-		/* Unix fds are passed to/from methods as integers */
-		{ DBUS_TYPE_UNIX_FD, "int" },
+		{ DBUS_TYPE_UNIX_FD, "::DBus::FileDescriptor" },
 		{ DBUS_TYPE_OBJECT_PATH, "::DBus::Path" },
 		{ DBUS_TYPE_SIGNATURE, "::DBus::Signature" },
 		{ DBUS_TYPE_VARIANT, "::DBus::Variant" },
@@ -194,15 +193,16 @@ bool is_primitive_type(const string &signature) {
 	}
 
 	switch (signature[0]) {
-		case 'y':  // uint8_t
-		case 'b':  // bool
-		case 'n':  // int16_t
-		case 'q':  // uint16_t
-		case 'i':  // int32_t
-		case 'u':  // uint32_t
-		case 'x':  // int64_t
-		case 't':  // uint64_t
-		case 'd':  // double
+		case DBUS_TYPE_BYTE:  // uint8_t
+		case DBUS_TYPE_BOOLEAN:  // bool
+		case DBUS_TYPE_INT16:  // int16_t
+		case DBUS_TYPE_UINT16:  // uint16_t
+		case DBUS_TYPE_INT32:  // int32_t
+		case DBUS_TYPE_UINT32:  // uint32_t
+		case DBUS_TYPE_INT64:  // int64_t
+		case DBUS_TYPE_UINT64:  // uint64_t
+		case DBUS_TYPE_DOUBLE:  // double
+		case DBUS_TYPE_UNIX_FD: // int
 			return true;
 		default:
 			return false;

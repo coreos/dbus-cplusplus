@@ -61,6 +61,21 @@ struct DXXAPI Signature : public std::string
 	}
 };
 
+class DXXAPI FileDescriptor
+{
+public:
+	FileDescriptor() : _fd(-1) {}
+	FileDescriptor(int n) : _fd(n) {}
+	FileDescriptor &operator = (int fd)
+	{
+		_fd = fd;
+		return *this;
+	}
+	int get() const { return _fd; }
+private:
+	int _fd;
+};
+
 struct DXXAPI Invalid {};
 
 class DXXAPI Variant
@@ -263,6 +278,12 @@ inline DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Sign
 	return iter;
 }
 
+inline DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::FileDescriptor &val)
+{
+	iter.append_fd(val.get());
+	return iter;
+}
+
 template<typename E>
 inline DBus::MessageIter &operator << (DBus::MessageIter &iter, const std::vector<E>& val)
 {
@@ -410,6 +431,12 @@ inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Path &val)
 inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Signature &val)
 {
 	val = iter.get_signature();
+	return ++iter;
+}
+
+inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::FileDescriptor &val)
+{
+	val = iter.get_fd();
 	return ++iter;
 }
 

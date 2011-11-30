@@ -224,6 +224,18 @@ const char *MessageIter::get_signature()
  	return chars;
 }
 
+bool MessageIter::append_fd(int fd)
+{
+	return append_basic(DBUS_TYPE_UNIX_FD, &fd);
+}
+
+int MessageIter::get_fd()
+{
+	int fd;
+	get_basic(DBUS_TYPE_UNIX_FD, &fd);
+	return fd;
+}
+
 MessageIter MessageIter::recurse() 
 {
 	MessageIter iter(msg());
