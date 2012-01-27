@@ -332,6 +332,7 @@ void ObjectProxy::_remove_pending_call(PendingCall *pending)
 			_pending_calls.erase(pi);
 			break;
 		}
+		++pi;
 	}
 	delete pending;
 }
