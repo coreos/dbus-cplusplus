@@ -150,6 +150,7 @@ private:
 class DXXAPI Dispatcher
 {
 public:
+	Dispatcher() : _dispatching(false) {}
 
 	virtual ~Dispatcher()
 	{}
@@ -177,6 +178,7 @@ private:
 
 	DefaultMutex _mutex_p;
 	Connection::PrivatePList _pending_queue;
+	bool _dispatching;
 };
 
 extern DXXAPI Dispatcher *default_dispatcher;

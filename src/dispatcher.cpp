@@ -25,6 +25,8 @@
 #include <config.h>
 #endif
 
+#include <cassert>
+
 #include <dbus-c++/dispatcher.h>
 
 #include <dbus/dbus.h>
@@ -176,26 +178,30 @@ void Dispatcher::dispatch_pending()
 {
 	_mutex_p.lock();
 
+	// Reentrancy is not permitted for this function
+	assert(!_dispatching);
+	_dispatching = true;
+
 	// SEEME: dbus-glib is dispatching only one message at a time to not starve the loop/other things...
 
 	while (_pending_queue.size() > 0)
 	{
 		Connection::PrivatePList::iterator i, j;
-		
 		i = _pending_queue.begin();
-
 		while (i != _pending_queue.end())
 		{
-			j = i; 
-			
+			j = i;
 			++j;
-
-			if ((*i)->do_dispatch())
+			_mutex_p.unlock();
+			bool done = (*i)->do_dispatch();
+			_mutex_p.lock();
+			if (done)
 				_pending_queue.erase(i);
 
 			i = j;
 		}
 	}
+	_dispatching = false;
 	_mutex_p.unlock();
 }
 
