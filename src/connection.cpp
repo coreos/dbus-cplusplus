@@ -463,4 +463,3 @@ int Connection::get_timeout()
 {
 	return _timeout;
 }
-

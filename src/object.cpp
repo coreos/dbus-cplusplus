@@ -55,7 +55,7 @@ struct ObjectAdaptor::Private
 };
 
 static DBusObjectPathVTable _vtable =
-{	
+{
 	ObjectAdaptor::Private::unregister_function_stub,
 	ObjectAdaptor::Private::message_function_stub,
 	NULL, NULL, NULL, NULL
@@ -72,7 +72,7 @@ DBusHandlerResult ObjectAdaptor::Private::message_function_stub(DBusConnection *
 
 	if (o)
 	{
-		Message msg(new Message::Private(dmsg));	
+		Message msg(new Message::Private(dmsg));
 
 		debug_log("in object %s", o->path().c_str());
 		debug_log(" got message #%d from %s to %s",
@@ -149,13 +149,21 @@ ObjectPathList ObjectAdaptor::child_nodes_from_prefix(const std::string &prefix)
 }
 
 ObjectAdaptor::ObjectAdaptor(Connection &conn, const Path &path)
-: Object(conn, path, conn.unique_name())
+: Object(conn, path, conn.unique_name()), _eflag(USE_EXCEPTIONS)
 {
 	register_obj();
 }
 
 ObjectAdaptor::ObjectAdaptor(Connection &conn, const Path &path, registration_time rtime)
-: Object(conn, path, conn.unique_name())
+: Object(conn, path, conn.unique_name()), _eflag(USE_EXCEPTIONS)
+{
+	if (rtime == REGISTER_NOW)
+		register_obj();
+}
+
+ObjectAdaptor::ObjectAdaptor(Connection &conn, const Path &path, registration_time rtime,
+				exceptions_flag eflag)
+: Object(conn, path, conn.unique_name()), _eflag(eflag)
 {
 	if (rtime == REGISTER_NOW)
 		register_obj();
@@ -218,10 +226,24 @@ bool ObjectAdaptor::handle_message(const Message &msg)
 			const char *interface   = cmsg.interface();
 
 			debug_log(" invoking method %s.%s", interface, member);
-		
+
 			InterfaceAdaptor *ii = find_interface(interface);
 			if (ii)
 			{
+				if (_eflag == AVOID_EXCEPTIONS) {
+					Message ret = ii->dispatch_method(cmsg);
+					Tag *tag = ret.tag();
+					if (tag) {
+						_continuations[tag] =
+						    new Continuation(conn(), cmsg, tag);
+					} else {
+						conn().send(ret);
+					}
+					return true;
+				}
+				// TODO(jglasgow@google.com): make this code
+				// conditional based on compile time option to
+				// support exceptions.
 				try
 				{
 					Message ret = ii->dispatch_method(cmsg);
@@ -342,7 +364,7 @@ void ObjectProxy::register_obj()
 	debug_log("registering remote object %s", path().c_str());
 
 	_filtered = new Callback<ObjectProxy, bool, const Message &>(this, &ObjectProxy::handle_message);
-	
+
 	conn().add_filter(_filtered);
 
 	InterfaceProxyTable::const_iterator ii = _interfaces.begin();
@@ -357,7 +379,7 @@ void ObjectProxy::register_obj()
 void ObjectProxy::unregister_obj()
 {
 	debug_log("unregistering remote object %s", path().c_str());
-	
+
 	InterfaceProxyTable::const_iterator ii = _interfaces.begin();
 	while (ii != _interfaces.end())
 	{

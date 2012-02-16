@@ -5,7 +5,6 @@
 #include "echo-client.h"
 #include <cstdio>
 #include <iostream>
-#include <pthread.h>
 #include <signal.h>
 
 using namespace std;
@@ -23,69 +22,28 @@ void EchoClient::Echoed(const DBus::Variant &value)
 	cout << "!";
 }
 
-/*
- * For some strange reason, libdbus frequently dies with an OOM
- */
-
-static const int THREADS = 3;
-
-static bool spin = true;
-
-void *greeter_thread(void *arg)
-{
-	DBus::Connection *conn = reinterpret_cast<DBus::Connection *>(arg);
-
-	EchoClient client(*conn, ECHO_SERVER_PATH, ECHO_SERVER_NAME);
-
-	char idstr[16];
-
-	snprintf(idstr, sizeof(idstr), "%lu", pthread_self());
-
-	for (int i = 0; i < 30 && spin; ++i)
-	{
-		cout << client.Hello(idstr) << endl;
-	}
-
-	cout << idstr << " done " << endl;
-
-	return NULL;
-}
-
 DBus::BusDispatcher dispatcher;
-
-void niam(int sig)
-{
-	spin = false;
-
-	dispatcher.leave();
-}
 
 int main()
 {
-	signal(SIGTERM, niam);
-	signal(SIGINT, niam);
-
-	DBus::_init_threading();
-
 	DBus::default_dispatcher = &dispatcher;
 
 	DBus::Connection conn = DBus::Connection::SessionBus();
 
-	pthread_t threads[THREADS];
+	EchoClient client(conn, ECHO_SERVER_PATH, ECHO_SERVER_NAME);
 
-	for (int i = 0; i < THREADS; ++i)
-	{
-		pthread_create(threads+i, NULL, greeter_thread, &conn);
-	}
-
-	dispatcher.enter();
-
-	cout << "terminating" << endl;
-
-	for (int i = 0; i < THREADS; ++i)
-	{
-		pthread_join(threads[i], NULL);
-	}
+        cout << client.Random() << endl;
+        cout << client.Hello("Hello") << endl;
+        try
+        {
+          client.Cat("foobar");
+        }
+        catch(DBus::Error &e)
+        {
+          cout << "Caught error: " << e.name() << endl
+               << "\t" << e.message() << endl;
+        }
+	client.Cat("/etc/hosts");
 
 	return 0;
 }

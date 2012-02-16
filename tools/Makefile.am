@@ -26,7 +26,7 @@ dbusxx_xml2cpp_LDADD = $(libdbus_cxx_la) $(xml_LIBS) -lctemplate_nothreads
 dbusxx_introspect_SOURCES = introspect.h introspect.cpp
 dbusxx_introspect_LDADD = $(libdbus_cxx_la)
 
-pkgdata_DATA = proxy-stubs.tpl adaptor-stubs.tpl
+pkgdata_DATA = proxy-stubs.tpl adaptor-stubs.tpl ef-adaptor-stubs.tpl
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

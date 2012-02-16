@@ -85,7 +85,7 @@ bool MessageIter::append_byte(unsigned char b)
 }
 
 unsigned char MessageIter::get_byte()
-{	
+{
  	unsigned char b;
 	get_basic(DBUS_TYPE_BYTE, &b);
  	return b;
@@ -97,7 +97,7 @@ bool MessageIter::append_bool(bool b)
 	return append_basic(DBUS_TYPE_BOOLEAN, &db);
 }
 
-bool MessageIter::get_bool()	
+bool MessageIter::get_bool()
 {
  	dbus_bool_t db;
 	get_basic(DBUS_TYPE_BOOLEAN, &db);
@@ -110,7 +110,7 @@ bool MessageIter::append_int16(signed short i)
 }
 
 signed short MessageIter::get_int16()
-{	
+{
  	signed short i;
 	get_basic(DBUS_TYPE_INT16, &i);
  	return i;
@@ -122,7 +122,7 @@ bool MessageIter::append_uint16(unsigned short u)
 }
 
 unsigned short MessageIter::get_uint16()
-{	
+{
 	unsigned short u;
 	get_basic(DBUS_TYPE_UINT16, &u);
  	return u;
@@ -134,7 +134,7 @@ bool MessageIter::append_int32(signed int i)
 }
 
 signed int MessageIter::get_int32()
-{	
+{
  	signed int i;
 	get_basic(DBUS_TYPE_INT32, &i);
  	return i;
@@ -146,7 +146,7 @@ bool MessageIter::append_uint32(unsigned int u)
 }
 
 unsigned int MessageIter::get_uint32()
-{	
+{
 	unsigned int u;
 	get_basic(DBUS_TYPE_UINT32, &u);
  	return u;
@@ -236,7 +236,7 @@ int MessageIter::get_fd()
 	return fd;
 }
 
-MessageIter MessageIter::recurse() 
+MessageIter MessageIter::recurse()
 {
 	MessageIter iter(msg());
 	dbus_message_iter_recurse((DBusMessageIter *)&_iter, (DBusMessageIter *)&(iter._iter));
@@ -290,7 +290,7 @@ MessageIter MessageIter::new_variant(const char *sig)
 	dbus_message_iter_open_container(
 		(DBusMessageIter *)_iter, DBUS_TYPE_VARIANT, sig, (DBusMessageIter *)&(var._iter)
 	);
-	return var;	
+	return var;
 }
 
 MessageIter MessageIter::new_struct()
@@ -392,28 +392,32 @@ Message::Message(Message::Private *p, bool incref)
 Message::Message(const Message &m)
 : _pvt(m._pvt)
 {
-	dbus_message_ref(_pvt->msg);
+	if (_pvt->msg)
+		dbus_message_ref(_pvt->msg);
 }
 
 Message::~Message()
 {
-	dbus_message_unref(_pvt->msg);
+	if (_pvt->msg)
+		dbus_message_unref(_pvt->msg);
 }
 
 Message &Message::operator = (const Message &m)
 {
 	if (&m != this)
 	{
-		dbus_message_unref(_pvt->msg);
+		if (_pvt->msg)
+			dbus_message_unref(_pvt->msg);
 		_pvt = m._pvt;
-		dbus_message_ref(_pvt->msg);
+		if (_pvt->msg)
+			dbus_message_ref(_pvt->msg);
 	}
 	return *this;
 }
 
 Message Message::copy()
 {
-	Private *pvt = new Private(dbus_message_copy(_pvt->msg));
+	Private *pvt = new Private(_pvt->msg ? dbus_message_copy(_pvt->msg) : NULL);
 	return Message(pvt);
 }
 
@@ -483,6 +487,12 @@ bool Message::is_signal(const char *interface, const char *member) const
 	return dbus_message_is_signal(_pvt->msg, interface, member);
 }
 
+Tag *Message::tag() const
+{
+	return _pvt->tag;
+}
+
+
 MessageIter Message::writer()
 {
 	MessageIter iter(*this);
@@ -497,7 +507,7 @@ MessageIter Message::reader() const
 	return iter;
 }
 
-/* 
+/*
 */
 
 ErrorMessage::ErrorMessage()
@@ -642,6 +652,14 @@ const char *CallMessage::signature() const
 }
 
 /*
+ */
+
+TagMessage::TagMessage(Tag *tag)
+{
+	_pvt->tag = tag;
+}
+
+/*
 */
 
 ReturnMessage::ReturnMessage(const CallMessage &callee)
@@ -653,4 +671,3 @@ const char *ReturnMessage::signature() const
 {
 	return dbus_message_get_signature(_pvt->msg);
 }
-

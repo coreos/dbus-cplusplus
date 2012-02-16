@@ -39,6 +39,7 @@ class SignalMessage;
 class ReturnMessage;
 class Error;
 class Connection;
+class Tag;
 
 class DXXAPI MessageIter
 {
@@ -91,7 +92,7 @@ public:
 	bool append_double(double d);
 
 	double get_double();
-	
+
 	bool append_string(const char *chars);
 
 	const char *get_string();
@@ -109,7 +110,7 @@ public:
 	int get_fd();
 
 	bool append_fd(int fd);
-	
+
 	MessageIter recurse();
 
 	bool append_array(char type, const void *ptr, size_t length);
@@ -161,7 +162,7 @@ friend class Message;
 class DXXAPI Message
 {
 public:
-	
+
 	struct Private;
 
 	Message(Private *, bool incref = true);
@@ -194,6 +195,8 @@ public:
 
 	bool is_signal(const char *interface, const char *member) const;
 
+	Tag *tag() const;
+
 	MessageIter reader() const;
 
 	MessageIter writer();
@@ -217,6 +220,7 @@ friend class ReturnMessage;
 friend class MessageIter;
 friend class Error;
 friend class Connection;
+friend class TagMessage;
 };
 
 /*
@@ -225,7 +229,7 @@ friend class Connection;
 class DXXAPI ErrorMessage : public Message
 {
 public:
-	
+
 	ErrorMessage();
 
 	ErrorMessage(const Message &, const char *name, const char *message);
@@ -271,7 +275,7 @@ public:
 class DXXAPI CallMessage : public Message
 {
 public:
-	
+
 	CallMessage();
 
 	CallMessage(const char *dest, const char *path, const char *iface, const char *method);
@@ -298,10 +302,19 @@ public:
 /*
 */
 
+class DXXAPI TagMessage : public Message
+{
+public:
+	TagMessage(Tag *tag);
+};
+
+/*
+*/
+
 class DXXAPI ReturnMessage : public Message
 {
 public:
-	
+
 	ReturnMessage(const CallMessage &callee);
 
 	const char *signature() const;

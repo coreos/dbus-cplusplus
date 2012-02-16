@@ -41,7 +41,7 @@ class DXXAPI Object
 protected:
 
 	Object(Connection &conn, const Path &path, const char *service);
-	
+
 public:
 
 	virtual ~Object();
@@ -49,7 +49,7 @@ public:
 	inline const DBus::Path &path() const;
 
 	inline const std::string &service() const;
-	
+
  	inline Connection &conn();
 
 protected:
@@ -122,8 +122,15 @@ public:
 		REGISTER_LATER,
 	};
 
+	enum exceptions_flag {
+		USE_EXCEPTIONS,
+		AVOID_EXCEPTIONS
+	};
+
 	ObjectAdaptor(Connection &conn, const Path &path);
 	ObjectAdaptor(Connection &conn, const Path &path, registration_time rtime);
+	ObjectAdaptor(Connection &conn, const Path &path, registration_time rtime,
+		      exceptions_flag eflag);
 
 	~ObjectAdaptor();
 
@@ -173,6 +180,8 @@ private:
 	typedef std::map<const Tag *, Continuation *> ContinuationMap;
 	ContinuationMap _continuations;
 
+	exceptions_flag _eflag;
+
 friend struct Private;
 };
 
@@ -219,7 +228,7 @@ public:
 private:
 
 	Message _invoke_method(CallMessage &);
-    
+
 	bool _invoke_method_noreply(CallMessage &call);
 
 	PendingCall *_invoke_method_async(CallMessage &call, int timeout = -1);
