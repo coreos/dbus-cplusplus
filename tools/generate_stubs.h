@@ -24,8 +24,17 @@
 #ifndef __DBUSXX_TOOLS_GENERATE_STUBS_H
 #define __DBUSXX_TOOLS_GENERATE_STUBS_H
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "xml.h"
 
-void generate_stubs(DBus::Xml::Document &doc, const char *filename, bool sync_mode, bool async_mode, const char *template_file);
+void generate_stubs(DBus::Xml::Document &doc,
+                    const char *filename,
+                    const std::vector< std::pair<std::string, std::string> > &macros,
+                    bool sync_mode,
+                    bool async_mode,
+                    const char *template_file);
 
 #endif//__DBUSXX_TOOLS_GENERATE_STUBS_H

@@ -21,16 +21,19 @@
  *
  */
 
+#include <ctemplate/template.h>
+
 #include <dbus/dbus.h>
 
 #include <cstdlib>
 #include <cstring>
-#include <string>
-#include <map>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <map>
 #include <sstream>
-#include <ctemplate/template.h>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "xml2cpp.h"
 #include "generate_stubs.h"
@@ -52,6 +55,8 @@ void usage(char *argv0)
 	cerr << "  " << prog << " <xmlfile> --proxy=<outfile.h> [ --proxy-template=<template.tpl> ] [ --templatedir=<template-dir> ] [ --[no]sync ] [ --[no]async ]" << endl << endl;
 	cerr << "  --OR--" << endl << endl;
 	cerr << "  " << prog << " <xmlfile> --adaptor=<outfile.h> [ --adaptor-template=<template.tpl> ] [ --templatedir=<template-dir> ]" << endl;
+	cerr << endl << "Flags which can be repeated:" << endl;
+	cerr << "    --define macroname value" << endl;
 	exit(-1);
 }
 
@@ -82,6 +87,7 @@ int main(int argc, char ** argv)
 	char *proxy, *adaptor;
 	const char *proxy_template = "proxy-stubs.tpl";
 	const char *adaptor_template = "adaptor-stubs.tpl";
+	std::vector< pair<string, string> > macros;
 
 	sync_proxy_mode = true;
 	async_proxy_mode = false;
@@ -127,6 +133,12 @@ int main(int argc, char ** argv)
 		{
 			async_proxy_mode = false;
 		}
+		else if (!strcmp(argv[a], "--define") && (a + 2) < argc)
+		{
+			const char *name = argv[++a];
+			const char *value = argv[++a];
+			macros.push_back(pair<string, string>(name, value));
+		}
 		else if (!strcmp(argv[a], "--nosync"))
 		{
 			sync_proxy_mode = false;
@@ -165,9 +177,9 @@ int main(int argc, char ** argv)
 	}
 
 	if (proxy_mode)
-		generate_stubs(doc, proxy, sync_proxy_mode, async_proxy_mode, proxy_template);
+		generate_stubs(doc, proxy, macros, sync_proxy_mode, async_proxy_mode, proxy_template);
 	else if (adaptor_mode)
-		generate_stubs(doc, adaptor, true, true, adaptor_template);
+		generate_stubs(doc, adaptor, macros, true, true, adaptor_template);
 
 	return 0;
 }
