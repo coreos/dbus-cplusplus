@@ -38,9 +38,35 @@ using namespace DBus;
 /*
 */
 
+MessageIter::MessageIter()
+: _pvt(new Private), _msg(NULL) {}
+
+MessageIter::MessageIter(Message &msg)
+: _pvt(new Private), _msg(&msg) {}
+
+MessageIter::MessageIter(const MessageIter &iter)
+: _pvt(new Private(*iter._pvt)), _msg(iter._msg) {}
+
+MessageIter::~MessageIter()
+{
+	delete _pvt;
+	_pvt = NULL;
+	_msg = NULL;
+}
+
+MessageIter &MessageIter::operator =(const MessageIter &iter)
+{
+	if (this != &iter)
+	{
+		*_pvt = *iter._pvt;
+		_msg = iter._msg;
+	}
+	return *this;
+}
+
 int MessageIter::type()
 {
-	return dbus_message_iter_get_arg_type((DBusMessageIter *)&_iter);
+	return dbus_message_iter_get_arg_type(&_pvt->iter);
 }
 
 bool MessageIter::at_end()
@@ -50,12 +76,12 @@ bool MessageIter::at_end()
 
 bool MessageIter::has_next()
 {
-	return dbus_message_iter_has_next((DBusMessageIter *)&_iter);
+	return dbus_message_iter_has_next(&_pvt->iter);
 }
 
 MessageIter &MessageIter::operator ++()
 {
-	dbus_message_iter_next((DBusMessageIter *)&_iter);
+	dbus_message_iter_next(&_pvt->iter);
 	return (*this);
 }
 
@@ -68,7 +94,7 @@ MessageIter MessageIter::operator ++(int)
 
 bool MessageIter::append_basic(int type_id, void *value)
 {
-	return dbus_message_iter_append_basic((DBusMessageIter *)&_iter, type_id, value);
+	return dbus_message_iter_append_basic(&_pvt->iter, type_id, value);
 }
 
 void MessageIter::get_basic(int type_id, void *ptr)
@@ -76,7 +102,7 @@ void MessageIter::get_basic(int type_id, void *ptr)
 	if (type() != type_id)
 		throw ErrorInvalidArgs("type mismatch");
 
-	dbus_message_iter_get_basic((DBusMessageIter *)_iter, ptr);
+	dbus_message_iter_get_basic(&_pvt->iter, ptr);
 }
 
 bool MessageIter::append_byte(unsigned char b)
@@ -93,7 +119,7 @@ unsigned char MessageIter::get_byte()
 
 bool MessageIter::append_bool(bool b)
 {
-	dbus_bool_t db = b;
+	dbus_bool_t db = b ? TRUE : FALSE;
 	return append_basic(DBUS_TYPE_BOOLEAN, &db);
 }
 
@@ -101,7 +127,7 @@ bool MessageIter::get_bool()
 {
  	dbus_bool_t db;
 	get_basic(DBUS_TYPE_BOOLEAN, &db);
- 	return (bool)db;
+	return db ? true : false;
 }
 
 bool MessageIter::append_int16(signed short i)
@@ -239,47 +265,47 @@ int MessageIter::get_fd()
 MessageIter MessageIter::recurse()
 {
 	MessageIter iter(msg());
-	dbus_message_iter_recurse((DBusMessageIter *)&_iter, (DBusMessageIter *)&(iter._iter));
+	dbus_message_iter_recurse(&_pvt->iter, &iter._pvt->iter);
 	return iter;
 }
 
 char *MessageIter::signature() const
 {
-	return dbus_message_iter_get_signature((DBusMessageIter *)&_iter);
+	return dbus_message_iter_get_signature(&_pvt->iter);
 }
 
 bool MessageIter::append_array(char type, const void *ptr, size_t length)
 {
-	return dbus_message_iter_append_fixed_array((DBusMessageIter *)&_iter, type, &ptr, length);
+	return dbus_message_iter_append_fixed_array(&_pvt->iter, type, &ptr, length);
 }
 
 int MessageIter::array_type()
 {
-	return dbus_message_iter_get_element_type((DBusMessageIter *)&_iter);
+	return dbus_message_iter_get_element_type(&_pvt->iter);
 }
 
 int MessageIter::get_array(void *ptr)
 {
 	int length;
-	dbus_message_iter_get_fixed_array((DBusMessageIter *)&_iter, ptr, &length);
+	dbus_message_iter_get_fixed_array(&_pvt->iter, ptr, &length);
 	return length;
 }
 
 bool MessageIter::is_array()
 {
-	return dbus_message_iter_get_arg_type((DBusMessageIter *)&_iter) == DBUS_TYPE_ARRAY;
+	return dbus_message_iter_get_arg_type(&_pvt->iter) == DBUS_TYPE_ARRAY;
 }
 
 bool MessageIter::is_dict()
 {
-	return is_array() && dbus_message_iter_get_element_type((DBusMessageIter *)_iter) == DBUS_TYPE_DICT_ENTRY;
+	return is_array() && dbus_message_iter_get_element_type(&_pvt->iter) == DBUS_TYPE_DICT_ENTRY;
 }
 
 MessageIter MessageIter::new_array(const char *sig)
 {
 	MessageIter arr(msg());
 	dbus_message_iter_open_container(
-		(DBusMessageIter *)&_iter, DBUS_TYPE_ARRAY, sig, (DBusMessageIter *)&(arr._iter)
+		&_pvt->iter, DBUS_TYPE_ARRAY, sig, &arr._pvt->iter
 	);
 	return arr;
 }
@@ -288,7 +314,7 @@ MessageIter MessageIter::new_variant(const char *sig)
 {
 	MessageIter var(msg());
 	dbus_message_iter_open_container(
-		(DBusMessageIter *)_iter, DBUS_TYPE_VARIANT, sig, (DBusMessageIter *)&(var._iter)
+		&_pvt->iter, DBUS_TYPE_VARIANT, sig, &var._pvt->iter
 	);
 	return var;
 }
@@ -297,7 +323,7 @@ MessageIter MessageIter::new_struct()
 {
 	MessageIter stu(msg());
 	dbus_message_iter_open_container(
-		(DBusMessageIter *)_iter, DBUS_TYPE_STRUCT, NULL, (DBusMessageIter *)&(stu._iter)
+		&_pvt->iter, DBUS_TYPE_STRUCT, NULL, &stu._pvt->iter
 	);
 	return stu;
 }
@@ -306,14 +332,14 @@ MessageIter MessageIter::new_dict_entry()
 {
 	MessageIter ent(msg());
 	dbus_message_iter_open_container(
-		(DBusMessageIter *)_iter, DBUS_TYPE_DICT_ENTRY, NULL, (DBusMessageIter *)&(ent._iter)
+		&_pvt->iter, DBUS_TYPE_DICT_ENTRY, NULL, &ent._pvt->iter
 	);
 	return ent;
 }
 
 void MessageIter::close_container(MessageIter &container)
 {
-	dbus_message_iter_close_container((DBusMessageIter *)&_iter, (DBusMessageIter *)&(container._iter));
+	dbus_message_iter_close_container(&_pvt->iter, &container._pvt->iter);
 }
 
 static bool is_basic_type(int typecode)
@@ -361,11 +387,11 @@ void MessageIter::copy_data(MessageIter &to)
 			MessageIter to_container (to.msg());
 			dbus_message_iter_open_container
 			(
-				(DBusMessageIter *)&(to._iter),
+				&to._pvt->iter,
 				from.type(),
 				from.type() == DBUS_TYPE_DICT_ENTRY ||
 				from.type() == DBUS_TYPE_STRUCT ? NULL : sig,
-				(DBusMessageIter *)&(to_container._iter)
+				&to_container._pvt->iter
 			);
 
 			from_container.copy_data(to_container);
@@ -496,14 +522,14 @@ Tag *Message::tag() const
 MessageIter Message::writer()
 {
 	MessageIter iter(*this);
-	dbus_message_iter_init_append(_pvt->msg, (DBusMessageIter *)&(iter._iter));
+	dbus_message_iter_init_append(_pvt->msg, &iter._pvt->iter);
 	return iter;
 }
 
 MessageIter Message::reader() const
 {
 	MessageIter iter(const_cast<Message &>(*this));
-	dbus_message_iter_init(_pvt->msg, (DBusMessageIter *)&(iter._iter));
+	dbus_message_iter_init(_pvt->msg, &iter._pvt->iter);
 	return iter;
 }
 

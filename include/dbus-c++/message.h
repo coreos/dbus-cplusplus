@@ -45,7 +45,13 @@ class DXXAPI MessageIter
 {
 public:
 
-	MessageIter() {}
+	MessageIter();
+
+	~MessageIter();
+
+	MessageIter(const MessageIter &iter);
+
+	MessageIter &operator =(const MessageIter &iter);
 
 	int type();
 
@@ -142,7 +148,7 @@ public:
 
 private:
 
-	DXXAPILOCAL MessageIter(Message &msg) : _msg(&msg) {}
+	DXXAPILOCAL MessageIter(Message &msg);
 
 	DXXAPILOCAL bool append_basic(int type_id, void *value);
 
@@ -150,9 +156,9 @@ private:
 
 private:
 
-	/* I'm sorry, but don't want to include dbus.h in the public api
-	 */
-	unsigned char _iter[sizeof(void *)*3+sizeof(int)*11];
+	struct Private;
+
+	Private *_pvt;
 
 	Message *_msg;
 

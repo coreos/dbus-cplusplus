@@ -36,6 +36,10 @@
 
 namespace DBus {
 
+struct DXXAPILOCAL MessageIter::Private {
+	DBusMessageIter iter;
+};
+
 struct DXXAPILOCAL Message::Private
 {
 	DBusMessage *msg;
