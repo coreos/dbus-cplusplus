@@ -178,6 +178,20 @@ void ObjectAdaptor::register_obj()
 {
 	debug_log("registering local object %s", path().c_str());
 
+        if (conn()._pvt->conn == NULL)
+        {
+                throw ErrorInvalidArgs("NULL connection");
+        }
+        else if (path().c_str() == NULL)
+        {
+                throw ErrorInvalidArgs("NULL path");
+        }
+        else if (path().c_str()[0] != '/')
+        {
+                std::string message = "Path must start with '/': " + path();
+                throw ErrorInvalidArgs(message.c_str());
+        }
+
 	if (!dbus_connection_register_object_path(conn()._pvt->conn, path().c_str(), &_vtable, this))
 	{
  		throw ErrorNoMemory("unable to register object path");
@@ -194,6 +208,20 @@ void ObjectAdaptor::unregister_obj()
 	_adaptor_table.erase(path());
 
 	debug_log("unregistering local object %s", path().c_str());
+
+        if (conn()._pvt->conn == NULL)
+        {
+                throw ErrorInvalidArgs("NULL connection");
+        }
+        else if (path().c_str() == NULL)
+        {
+                throw ErrorInvalidArgs("NULL path");
+        }
+        else if (path().c_str()[0] != '/')
+        {
+                std::string message = "Path must start with '/': " + path();
+                throw ErrorInvalidArgs(message.c_str());
+        }
 
 	dbus_connection_unregister_object_path(conn()._pvt->conn, path().c_str());
 }
