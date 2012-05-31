@@ -27,6 +27,7 @@
 
 #include <cstring>
 #include <errno.h>
+#include <unistd.h>
 #include "api.h"
 #include "dispatcher.h"
 #include "util.h"
