@@ -33,6 +33,12 @@
 #include "internalerror.h"
 #include "message_p.h"
 
+// TODO(thestig) Remove this once Chromium stops supporting Ubuntu Lucid, where
+// libdbus 1.2.16 does not have DBUS_TYPE_UNIX_FD.
+#ifndef DBUS_TYPE_UNIX_FD
+#define DBUS_TYPE_UNIX_FD      ((int) 'h')
+#endif
+
 using namespace DBus;
 
 /*
