@@ -265,6 +265,19 @@ struct Threading
 		return new Mx;
 	}
 
+#ifndef DBUS_HAS_RECURSIVE_MUTEX
+	static bool mutex_free(Mutex *mx)
+	{
+		delete mx;
+		return false;
+	}
+
+	static bool mutex_lock(Mutex *mx)
+	{
+		mx->lock();
+		return false;
+	}
+#else
 	static void mutex_free(Mutex *mx)
 	{
 		delete mx;
@@ -274,6 +287,7 @@ struct Threading
 	{
 		mx->lock();
 	}
+#endif//DBUS_HAS_RECURSIVE_MUTEX
 
 	static void mutex_unlock(Mutex *mx)
 	{
