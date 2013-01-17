@@ -103,13 +103,7 @@ public:
 	}
 
 	template <typename T>
-	operator T() const
-	{
-		T cast;
-		MessageIter ri = _msg.reader();
-		ri >> cast;
-		return cast;
-	}
+	operator T() const;
 
 private:
 
@@ -440,6 +434,8 @@ inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::FileDescri
 	return ++iter;
 }
 
+extern DXXAPI DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Variant &val);
+
 template<typename E>
 inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, std::vector<E>& val)
 {
@@ -521,6 +517,14 @@ inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Struct<T1,
 	return ++iter;
 }
 
-extern DXXAPI DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Variant &val);
+template <typename T>
+inline DBus::Variant::operator T() const
+{
+	T cast;
+	DBus::MessageIter ri = _msg.reader();
+	ri >> cast;
+	return cast;
+}
+
 	
 #endif//__DBUSXX_TYPES_H
