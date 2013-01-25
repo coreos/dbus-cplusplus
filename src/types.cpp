@@ -34,7 +34,7 @@
 #include "message_p.h"
 #include "internalerror.h"
 
-using namespace DBus;
+namespace DBus {
 
 Variant::Variant()
 : _msg(CallMessage()) // dummy message used as temporary storage for variant data
@@ -103,3 +103,5 @@ MessageIter &operator >> (MessageIter &iter, Variant &val)
 
 	return ++iter;
 }
+
+} /* namespace DBus */

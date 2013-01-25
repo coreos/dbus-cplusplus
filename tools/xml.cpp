@@ -28,6 +28,10 @@
 
 #include <expat.h>
 
+namespace DBus {
+
+namespace Xml {
+
 std::istream &operator >> (std::istream &in, DBus::Xml::Document &doc)
 {
 	std::stringbuf xmlbuf;
@@ -41,9 +45,6 @@ std::ostream &operator << (std::ostream &out, const DBus::Xml::Document &doc)
 {
 	return out << doc.to_xml();
 }
-
-using namespace DBus;
-using namespace DBus::Xml;
 
 Error::Error(const char *error, int line, int column)
 {
@@ -313,3 +314,6 @@ void Document::Expat::end_element_handler(void *data, const XML_Char *name)
 	doc->_depth--;
 }
 
+} /* namespace Xml */
+
+} /* namespace DBus */

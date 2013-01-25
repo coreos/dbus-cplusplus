@@ -191,8 +191,6 @@ struct type< Struct<T1,T2,T3,T4,T5,T6,T7,T8> >
 	}
 };
 
-} /* namespace DBus */
-
 extern DXXAPI DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Variant &val);
 
 inline DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Invalid &)
@@ -526,5 +524,6 @@ inline DBus::Variant::operator T() const
 	return cast;
 }
 
-	
+} /* namespace DBus */
+
 #endif//__DBUSXX_TYPES_H

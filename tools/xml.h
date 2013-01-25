@@ -132,11 +132,11 @@ private:
 	int _depth;
 };
 
+std::istream &operator >> (std::istream &, DBus::Xml::Document &);
+std::ostream &operator << (std::ostream &, DBus::Xml::Document &);
+
 } /* namespace Xml */
 
 } /* namespace DBus */
-
-std::istream &operator >> (std::istream &, DBus::Xml::Document &);
-std::ostream &operator << (std::ostream &, DBus::Xml::Document &);
 
 #endif//__DBUSXX_XML_H
